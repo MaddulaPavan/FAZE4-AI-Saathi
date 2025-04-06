@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -33,6 +32,9 @@ const Auth = () => {
   }
   
   const handleRoleSelect = (role: UserRole) => {
+    if (role === 'organization') {
+      console.log('Organization role selected');
+    }
     setSelectedRole(role);
     setStep('login');
   };

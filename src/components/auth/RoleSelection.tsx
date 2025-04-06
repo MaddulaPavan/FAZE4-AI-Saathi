@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { UserRole } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -36,6 +35,11 @@ export function RoleSelection({ onRoleSelect }: RoleSelectionProps) {
       title: 'Admin',
       icon: <ShieldCheck className="h-8 w-8 text-edubridge-blue-bright" />,
       description: 'Manage platform content, users, and analytics'
+    },
+    {
+      id: 'organization',
+      title: 'Organization',
+      description: 'Manage and oversee educational activities for your institution'
     }
   ];
 

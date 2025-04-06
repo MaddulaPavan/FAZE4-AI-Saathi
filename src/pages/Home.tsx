@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -125,15 +124,15 @@ const Home = () => {
       image: '/placeholder.svg'
     },
     {
-      id: 'admin',
-      title: 'Admin',
+      id: 'organization',
+      title: 'Organization',
       icon: <ShieldCheck className="h-12 w-12 text-edubridge-blue-bright" />,
-      description: 'Manage platform content, users, and analytics',
+      description: 'Manage platform content, users, and analytics for your institution',
       benefits: [
         'Comprehensive analytics',
-        'User management',
-        'Content moderation',
-        'System administration'
+        'User and content management',
+        'Collaborate with mentors and students',
+        'Drive educational impact'
       ],
       image: '/placeholder.svg'
     }
@@ -167,7 +166,7 @@ const Home = () => {
       <section id="home" className="relative min-h-screen flex items-center pt-16">
         {/* Background with pattern and gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-edubridge-purple/10 to-edubridge-blue/10 dark:from-gray-900 dark:to-gray-800">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiM5Qjg3RjUiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0aDR2MWgtNHYtMXptMC0yaDR2MWgtNHYtMXptMCAyaDR2MWgtNHYtMXptLTIgLTFoNHYxaC00di0xem0tMiAyaDR2MWgtNHYtMXptMTYgLTExaDF2MmgtMXYtMnptMCAxaDF2MWgtMXYtMXptLTE2IC0yaDF2MmgtMXYtMnptMCAxaDF2MWgtMXYtMXptMCAtOGgxdjFoLTF2LTF6bTAgM2gxdjJoLTF2LTJ6bTAgMWgxdjFoLTF2LTF6bTAgNGgxdjJoLTF2LTJ6bTAgMWgxdjFoLTF2LTF6bS0xMiAyMGgxdjJoLTF2LTJ6bTAgMWgxdjFoLTF2LTF6bS0yIC0xaDF2MmgtMXYtMnptMCAxaDF2MWgtMXYtMXptMyA0aDF2MmgtMXYtMnptMCAxaDF2MWgtMXYtMXptMyAtOGgxdjJoLTF2LTJ6bTAgMWgxdjFoLTF2LTF6bTAgLThIMTF2MkgxMHYtMnptMCAySDF2MUgwdi0xem0yIC00aDF2MmgtMXYtMnptMCAxaDF2MWgtMXYtMXptLTQgLTJoMXYySDB2LTJ6bTAgMWgxdjFIMHYtMXptMTQgLTNoMXYySDE0di0yem0wIDFoMXYxSDE0di0xem03IDRoMXYySDB2LTJ6bTAgMWgxdjFIMHYtMXptMCAtMmgxdjJIMHYtMnptMCAxaDF2MUgwdi0xem03IC0xMmgxdjJIMjh2LTJ6bTAgMWgxdjFIMjh2LTF6bS03IC0yaDF2MmgyOHYtMnptMCAxaDF2MWgtMXYtMXoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-70"></div>
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiM5Qjg3RjUiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0aDR2MWgtNHYtMXptMC0yaDR2MWgtNHYtMXptMCAyaDR2MWgtNHYtMXptLTIgLTFoNHYxaC00di0xem0tMiAyaDR2MWgtNHYtMXptMTYgLTExaDF2MmgtMXYtMnptMCAxaDF2MWgtMXYtMXptLTE2IC0yaDF2MmgtMXYtMnptMCAxaDF2MWgtMXYtMXptMCAtOGgxdjFoLTF2LTF6bTAgM2gxdjJoLTF2LTJ6bTAgMWgxdjFoLTF2LTF6bTAgNGgxdjJoLTF2LTJ6bTAgMWgxdjFoLTF2LTF6bS0xMiAyMGgxdjJoLTF2LTJ6bTAgMWgxdjFoLTF2LTF6bS0yIC0xaDF2MmgtMXYtMnptMCAxaDF2MWgtMXYtMnptMyA0aDF2MmgtMXYtMnptMCAxaDF2MWgtMXYtMXptMyAtOGgxdjJoLTF2LTJ6bTAgMWgxdjFoLTF2LTF6bTAgLThIMTF2MkgxMHYtMnptMCAySDF2MUgwdi0xem0yIC00aDF2MmgtMXYtMnptMCAxaDF2MWgtMXYtMXptLTQgLTJoMXYyaC0xdi0yem0wIDFoMXYxaC0xdi0xem0xNCAtaDF2MkgxNHYtMnptMCAxaDF2MUgxNHYtMXptNyA0aDF2Mkgwdi0yem0wIDFoMXYxSDB2LTF6bTAgLTJoMXYyaDB2LTJ6bTAgMWgxdjFIMHYtMXptNyAtMTJoMXYyaDB2LTJ6bTAgMWgxdjFIMHYtMXptLTcgLTJoMXYyaDI4di0yem0wIDFoMXYxaC0xdi0xeiIvPjwvZz48L2c+PC9zdmc+')] opacity-70"></div>
         </div>
 
         {/* Hero Content */}
@@ -223,12 +222,14 @@ const Home = () => {
                 <div className="absolute -bottom-8 left-20 w-72 h-72 bg-edubridge-purple rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
                 
                 <div className="relative">
-                  <img 
-                    src="/placeholder.svg" 
-                    alt="Students learning through AI Saathi" 
-                    className="rounded-2xl shadow-2xl w-full object-cover z-10 relative"
-                    style={{ minHeight: "350px" }}
-                  />
+                <img
+  src="/images/aisaathi1.png"
+  alt="Students learning through AI Saathi"
+  className="rounded-2xl shadow-2xl w-full object-cover z-10 relative"
+  style={{ minHeight: "350px" }}
+/>
+
+
                   {/* Decorative elements */}
                   <div className="absolute -top-6 -right-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 z-20 animate-float">
                     <div className="flex items-center gap-2">
@@ -366,12 +367,12 @@ const Home = () => {
               transition={{ duration: 0.7 }}
               className="rounded-lg overflow-hidden shadow-xl"
             >
-              <img 
-                src="/placeholder.svg" 
-                alt="Rural students learning" 
-                className="w-full h-auto object-cover"
-                style={{ minHeight: "400px" }}
-              />
+<img
+  src="/images/aisaathi2.png"
+  alt="Students learning through AI Saathi"
+  className="rounded-2xl shadow-2xl w-full object-cover z-10 relative"
+  style={{ minHeight: "350px" }}
+/>
             </motion.div>
           </div>
         </div>
@@ -437,7 +438,7 @@ const Home = () => {
             <Badge className="mb-4">Join Us</Badge>
             <h2 className="text-3xl md:text-4xl font-bold mb-6">Choose Your Role</h2>
             <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Whether you're a student, mentor, parent, or administrator, AI Saathi offers tailored features to support your educational journey.
+              Whether you're a student, mentor, parent, or organization, AI Saathi offers tailored features to support your educational journey.
             </p>
           </motion.div>
 
@@ -494,7 +495,7 @@ const Home = () => {
       <section className="py-24 bg-gradient-to-br from-edubridge-blue to-edubridge-purple text-white relative overflow-hidden">
         {/* Decorative elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRoNHYxaC00di0xem0wLTJoNHYxaC00di0xem0wIDJoNHYxaC00di0xem0tMiAtMWg0djFoLTR2LTF6bS0yIDJoNHYxaC00di0xem0xNiAtMTFoMXYyaC0xdi0yem0wIDFoMXYxaC0xdi0xem0tMTYgLTJoMXYyaC0xdi0yem0wIDFoMXYxaC0xdi0xem0wIC04aDF2MWgtMXYtMXptMCAzaDF2MmgtMXYtMnptMCAxaDF2MWgtMXYtMXptMCA0aDF2MmgtMXYtMnptMCAxaDF2MWgtMXYtMXptLTEyIDIwaDF2MmgtMXYtMnptMCAxaDF2MWgtMXYtMXptLTIgLTFoMXYyaC0xdi0yem0wIDFoMXYxaC0xdi0xem0zIDRoMXYyaC0xdi0yem0wIDFoMXYxaC0xdi0xem0zIC04aDF2MmgtMXYtMnptMCAxaDF2MWgtMXYtMXptMCAtOEgxMXYySDF2LTJ6bTAgMkgxdjFIMHYtMXptMiAtNGgxdjJoLTF2LTJ6bTAgMWgxdjFoLTF2LTF6bS00IC0yaDF2Mkgwdi0yem0wIDFoMXYxSDB2LTF6bTE0IC0zaDF2MkgxNHYtMnptMCAxaDF2MUgxNHYtMXptNyA0aDF2Mkgwdi0yem0wIDFoMXYxSDB2LTF6bTAgLTJoMXYySDB2LTJ6bTAgMWgxdjFIMHYtMXptNyAtMTJoMXYySDB2LTJ6bTAgMWgxdjFIMHYtMXptLTcgLTJoMXYyaDI4di0yem0wIDFoMXYxaC0xdi0xeiIvPjwvZz48L2c+PC9zdmc+')] opacity-20"></div>
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRoNHYxaC00di0xem0wLTJoNHYxaC00di0xem0wIDJoNHYxaC00di0xem0tMiAtMWg0djFoLTR2LTF6bS0yIDJoNHYxaC00di0xem0xNiAtMTFoMXYyaC0xdi0yem0wIDFoMXYxaC0xdi0xem0tMTYgLTJoMXYyaC0xdi0yem0wIDFoMXYxaC0xdi0xem0wIC04aDF2MWgtMXYtMXptMCAzaDF2MmgtMXYtMnptMCAxaDF2MWgtMXYtMXptMCA0aDF2MmgtMXYtMnptMCAxaDF2MWgtMXYtMXptLTEyIDIwaDF2MmgtMXYtMnptMCAxaDF2MWgtMXYtMXptLTIgLTFoMXYyaC0xdi0yem0wIDFoMXYxaC0xdi0xem0zIDRoMXYyaC0xdi0yem0wIDFoMXYxaC0xdi0xem0zIC04aDF2MmgtMXYtMnptMCAxaDF2MWgtMXYtMXptMCAtOEgxMXYySDF2LTJ6bTAgMkgxdjFIMHYtMXptMiAtNGgxdjJoLTF2LTJ6bTAgMWgxdjFoLTF2LTF6bS00IC0yaDF2Mkgwdi0yem0wIDFoMXYxSDB2LTF6bTE0IC0zaDF2MkgxNHYtMnptMCAxaDF2MUgxNHYtMXptNyA0aDF2Mkgwdi0yem0wIDFoMXYxSDB2LTF6bTAgLTJoMXYyaDB2LTJ6bTAgMWgxdjFIMHYtMXptNyAtMTJoMXYyaDB2LTJ6bTAgMWgxdjFIMHYtMXptLTcgLTJoMXYyaDI4di0yem0wIDFoMXYxaC0xdi0xeiIvPjwvZz48L2c+PC9zdmc+')] opacity-20"></div>
         </div>
         
         <div className="container mx-auto px-4 text-center relative z-10">
@@ -523,44 +524,44 @@ const Home = () => {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-10">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-6 md:mb-0">
-              <div className="flex items-center mb-2">
-                <div className="bg-gradient-to-r from-edubridge-blue to-edubridge-purple rounded-lg p-2 mr-2">
-                  <span className="text-white font-bold text-xl">AI</span>
+          <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-6 md:mb-0">
+              <div class="flex items-center mb-2">
+                <div class="bg-gradient-to-r from-edubridge-blue to-edubridge-purple rounded-lg p-2 mr-2">
+                  <span class="text-white font-bold text-xl">AI</span>
                 </div>
-                <h2 className="text-2xl font-bold">Saathi</h2>
+                <h2 class="text-2xl font-bold">Saathi</h2>
               </div>
-              <p className="text-sm text-gray-400">Empowering rural education in India</p>
+              <p class="text-sm text-gray-400">Empowering rural education in India</p>
             </div>
-            <div className="flex gap-12">
+            <div class="flex gap-12">
               <div>
-                <h3 className="font-medium mb-2">Platform</h3>
-                <ul className="text-sm text-gray-400">
-                  <li className="mb-1 hover:text-white transition-colors cursor-pointer">Features</li>
-                  <li className="mb-1 hover:text-white transition-colors cursor-pointer">Community</li>
-                  <li className="mb-1 hover:text-white transition-colors cursor-pointer">Support</li>
+                <h3 class="font-medium mb-2">Platform</h3>
+                <ul class="text-sm text-gray-400">
+                  <li class="mb-1 hover:text-white transition-colors cursor-pointer">Features</li>
+                  <li class="mb-1 hover:text-white transition-colors cursor-pointer">Community</li>
+                  <li class="mb-1 hover:text-white transition-colors cursor-pointer">Support</li>
                 </ul>
               </div>
               <div>
-                <h3 className="font-medium mb-2">Resources</h3>
-                <ul className="text-sm text-gray-400">
-                  <li className="mb-1 hover:text-white transition-colors cursor-pointer">Blog</li>
-                  <li className="mb-1 hover:text-white transition-colors cursor-pointer">FAQs</li>
-                  <li className="mb-1 hover:text-white transition-colors cursor-pointer">Contact</li>
+                <h3 class="font-medium mb-2">Resources</h3>
+                <ul class="text-sm text-gray-400">
+                  <li class="mb-1 hover:text-white transition-colors cursor-pointer">Blog</li>
+                  <li class="mb-1 hover:text-white transition-colors cursor-pointer">FAQs</li>
+                  <li class="mb-1 hover:text-white transition-colors cursor-pointer">Contact</li>
                 </ul>
               </div>
               <div>
-                <h3 className="font-medium mb-2">Legal</h3>
-                <ul className="text-sm text-gray-400">
-                  <li className="mb-1 hover:text-white transition-colors cursor-pointer">Privacy</li>
-                  <li className="mb-1 hover:text-white transition-colors cursor-pointer">Terms</li>
-                  <li className="mb-1 hover:text-white transition-colors cursor-pointer">Policies</li>
+                <h3 class="font-medium mb-2">Legal</h3>
+                <ul class="text-sm text-gray-400">
+                  <li class="mb-1 hover:text-white transition-colors cursor-pointer">Privacy</li>
+                  <li class="mb-1 hover:text-white transition-colors cursor-pointer">Terms</li>
+                  <li class="mb-1 hover:text-white transition-colors cursor-pointer">Policies</li>
                 </ul>
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-8 pt-6 text-sm text-gray-400 text-center">
+          <div class="border-t border-gray-800 mt-8 pt-6 text-sm text-gray-400 text-center">
             <p>&copy; {new Date().getFullYear()} AI Saathi. All rights reserved.</p>
           </div>
         </div>
