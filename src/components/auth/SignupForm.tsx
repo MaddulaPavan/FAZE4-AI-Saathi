@@ -16,45 +16,55 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
-const loginSchema = z.object({
+const signupSchema = z.object({
+  name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
   email: z.string().email({ message: 'Please enter a valid email address' }),
   password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
+  confirmPassword: z.string().min(6, { message: 'Password must be at least 6 characters' })
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
-interface LoginFormProps {
+interface SignupFormProps {
   selectedRole: UserRole;
   onBack: () => void;
-  onSignupClick: () => void;
+  onLoginClick: () => void;
 }
 
-export function LoginForm({ selectedRole, onBack, onSignupClick }: LoginFormProps) {
+export function SignupForm({ selectedRole, onBack, onLoginClick }: SignupFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { login } = useAuth();
   const { toast } = useToast();
   
-  const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<z.infer<typeof signupSchema>>({
+    resolver: zodResolver(signupSchema),
     defaultValues: {
+      name: '',
       email: '',
       password: '',
+      confirmPassword: '',
     },
   });
 
-  async function onSubmit(data: z.infer<typeof loginSchema>) {
+  async function onSubmit(data: z.infer<typeof signupSchema>) {
     setIsLoading(true);
     try {
+      // In a real app, we'd create the user first
+      // For now, just log them in with the new credentials
       await login(data.email, data.password, selectedRole);
       toast({
-        title: 'Login successful',
-        description: `Welcome back! You've logged in as a ${selectedRole}.`,
+        title: 'Account created successfully',
+        description: `Welcome to EduBridge, ${data.name}!`,
       });
     } catch (error) {
       toast({
-        title: 'Login failed',
-        description: 'Please check your credentials and try again.',
+        title: 'Signup failed',
+        description: 'There was an error creating your account. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -72,12 +82,29 @@ export function LoginForm({ selectedRole, onBack, onSignupClick }: LoginFormProp
   return (
     <div className="space-y-4 w-full max-w-md mx-auto">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold">Login as {roleLabels[selectedRole]}</h2>
-        <p className="text-muted-foreground">Enter your credentials to continue</p>
+        <h2 className="text-2xl font-bold">Sign Up as {roleLabels[selectedRole]}</h2>
+        <p className="text-muted-foreground">Create your account to get started</p>
       </div>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Full Name
+                </FormLabel>
+                <FormControl>
+                  <Input placeholder="John Doe" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
           <FormField
             control={form.control}
             name="email"
@@ -88,7 +115,7 @@ export function LoginForm({ selectedRole, onBack, onSignupClick }: LoginFormProp
                   Email
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="your.email@example.com" {...field} />
+                  <Input placeholder="you@example.com" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -113,7 +140,7 @@ export function LoginForm({ selectedRole, onBack, onSignupClick }: LoginFormProp
                     />
                     <button 
                       type="button" 
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" 
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -125,13 +152,43 @@ export function LoginForm({ selectedRole, onBack, onSignupClick }: LoginFormProp
             )}
           />
 
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                  <Lock className="h-4 w-4" />
+                  Confirm Password
+                </FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Input 
+                      type={showConfirmPassword ? "text" : "password"} 
+                      placeholder="••••••••" 
+                      {...field} 
+                    />
+                    <button 
+                      type="button" 
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <div className="flex flex-col gap-3 pt-2">
             <Button 
               type="submit" 
-              className="bg-edubridge-blue hover:bg-edubridge-blue-bright w-full"
+              className="bg-edubridge-purple hover:bg-edubridge-purple-secondary"
               disabled={isLoading}
             >
-              {isLoading ? 'Logging in...' : 'Login'}
+              {isLoading ? 'Creating Account...' : 'Create Account'}
             </Button>
             
             <div className="flex items-center justify-between">
@@ -147,11 +204,11 @@ export function LoginForm({ selectedRole, onBack, onSignupClick }: LoginFormProp
               <Button 
                 type="button" 
                 variant="link"
-                onClick={onSignupClick}
+                onClick={onLoginClick}
                 disabled={isLoading}
-                className="text-sm text-edubridge-purple"
+                className="text-sm text-edubridge-blue"
               >
-                Don't have an account? Sign up
+                Already have an account? Log in
               </Button>
             </div>
           </div>
