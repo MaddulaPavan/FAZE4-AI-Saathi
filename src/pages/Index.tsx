@@ -9,7 +9,7 @@ const Index = () => {
   useEffect(() => {
     // Use a timeout to add a small delay for the animation
     const timer = setTimeout(() => {
-      navigate("/auth");
+      navigate("/home");
     }, 2000); // Updated to 2 seconds for better animation visibility
     
     return () => clearTimeout(timer);
@@ -32,7 +32,7 @@ const Index = () => {
             ease: "easeInOut" 
           }}
         >
-          <h1 className="text-6xl font-bold text-white">EduBridge</h1>
+          <h1 className="text-6xl font-bold text-white">AI Saathi</h1>
         </motion.div>
         <motion.p 
           className="text-xl text-gray-600 dark:text-gray-300"

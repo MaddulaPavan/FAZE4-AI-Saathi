@@ -1,443 +1,484 @@
 
-import { useState } from "react";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, BookOpen, FileText, Download, BookmarkPlus, Filter, ArrowUpDown, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { 
+  FileText, 
+  Search, 
+  Download, 
+  BookOpen, 
+  ChevronDown,
+  Filter,
+  Book
+} from "lucide-react";
 import { motion } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+
+type StudyMaterial = {
+  id: number;
+  title: string;
+  description: string;
+  subject: string;
+  fileSize: string;
+  format: string;
+} & (
+  | { type: 'textbook'; className: string; source: string }
+  | { type: 'paper'; className: string; year: string }
+  | { type: 'reference'; category: string }
+);
 
 const StudyMaterials = () => {
-  const [activeTab, setActiveTab] = useState("textbooks");
   const [searchQuery, setSearchQuery] = useState("");
-  const [classFilter, setClassFilter] = useState("all");
-  const [subjectFilter, setSubjectFilter] = useState("all");
-  const [isOpen, setIsOpen] = useState(false);
-  
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { 
-        staggerChildren: 0.1
-      }
-    }
-  };
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [selectedFormat, setSelectedFormat] = useState<string | null>(null);
 
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
-      opacity: 1,
-      transition: { 
-        type: "spring",
-        stiffness: 100
-      }
-    }
-  };
-  
-  const textbooks = [
+  // Sample data for study materials
+  const studyMaterials: StudyMaterial[] = [
+    // Textbooks
     {
       id: 1,
-      title: "Mathematics - Class X",
-      description: "NCERT Mathematics textbook for Class 10",
+      type: 'textbook',
+      title: "Mathematics Grade 10",
+      description: "Complete mathematics textbook for grade 10 including algebra, geometry, and trigonometry",
       subject: "Mathematics",
-      class: "Class X",
+      className: "10",
       source: "NCERT",
       fileSize: "15 MB",
       format: "PDF"
     },
     {
       id: 2,
-      title: "Science - Class X",
-      description: "NCERT Science textbook covering Physics, Chemistry and Biology for Class 10",
+      type: 'textbook',
+      title: "Science for Elementary Students",
+      description: "Comprehensive guide to basic science for elementary education",
       subject: "Science",
-      class: "Class X",
-      source: "NCERT",
-      fileSize: "18 MB",
-      format: "PDF"
-    },
-    {
-      id: 3,
-      title: "English - Class X",
-      description: "NCERT English textbook with literature and grammar for Class 10",
-      subject: "English",
-      class: "Class X",
-      source: "NCERT",
+      className: "5",
+      source: "State Board",
       fileSize: "12 MB",
       format: "PDF"
     },
     {
-      id: 4,
-      title: "Social Science - Class X",
-      description: "NCERT Social Science textbook covering History, Geography, Political Science and Economics for Class 10",
-      subject: "Social Science",
-      class: "Class X",
-      source: "NCERT",
-      fileSize: "20 MB",
-      format: "PDF"
-    }
-  ];
-  
-  const questionPapers = [
-    {
-      id: 5,
-      title: "Mathematics - Class X - 2024",
-      description: "CBSE Class 10 Mathematics question paper with solutions",
-      subject: "Mathematics",
-      class: "Class X", 
-      year: "2024",
-      fileSize: "5 MB",
-      format: "PDF"
-    },
-    {
-      id: 6,
-      title: "Science - Class X - 2024",
-      description: "CBSE Class 10 Science question paper with solutions",
-      subject: "Science",
-      class: "Class X",
-      year: "2024",
-      fileSize: "6 MB",
-      format: "PDF"
-    },
-    {
-      id: 7,
-      title: "Mathematics - Class X - 2023",
-      description: "CBSE Class 10 Mathematics question paper with solutions",
-      subject: "Mathematics",
-      class: "Class X",
-      year: "2023",
-      fileSize: "5 MB",
-      format: "PDF"
-    },
-    {
-      id: 8,
-      title: "Science - Class X - 2023",
-      description: "CBSE Class 10 Science question paper with solutions",
-      subject: "Science",
-      class: "Class X",
-      year: "2023",
-      fileSize: "6 MB",
-      format: "PDF"
-    }
-  ];
-  
-  const resourceGuides = [
-    {
-      id: 9,
-      title: "NEET Preparation Guide",
-      description: "Complete guide for NEET preparation with study plan and tips",
-      subject: "Multiple",
-      category: "Competitive Exam",
+      id: 3,
+      type: 'textbook',
+      title: "English Grammar Handbook",
+      description: "Complete guide to English grammar rules with examples",
+      subject: "English",
+      className: "8",
+      source: "Oxford",
       fileSize: "8 MB",
       format: "PDF"
     },
     {
-      id: 10,
-      title: "JEE Main Preparation Guide",
-      description: "Complete guide for JEE Main preparation with sample problems",
-      subject: "Multiple",
-      category: "Competitive Exam",
+      id: 4,
+      type: 'textbook',
+      title: "Introduction to Geography",
+      description: "Explore landforms, climate patterns, and human geography concepts",
+      subject: "Geography",
+      className: "9",
+      source: "NCERT",
       fileSize: "10 MB",
+      format: "EPUB"
+    },
+    // Previous year papers
+    {
+      id: 5,
+      type: 'paper',
+      title: "Mathematics Annual Exam 2022",
+      description: "Previous year mathematics examination paper with solution key",
+      subject: "Mathematics",
+      className: "12",
+      year: "2022",
+      fileSize: "2 MB",
       format: "PDF"
     },
     {
-      id: 11,
-      title: "Government Scholarship Guide",
-      description: "Comprehensive guide to government scholarships available for students",
-      subject: "Career",
-      category: "Scholarship",
+      id: 6,
+      type: 'paper',
+      title: "Science Half-Yearly Exam 2023",
+      description: "Mid-term science examination questions from 2023",
+      subject: "Science",
+      className: "10",
+      year: "2023",
+      fileSize: "3 MB",
+      format: "PDF"
+    },
+    {
+      id: 7,
+      type: 'paper',
+      title: "English Language Assessment 2021",
+      description: "Previous year English language examination with marking scheme",
+      subject: "English",
+      className: "8",
+      year: "2021",
+      fileSize: "1.5 MB",
+      format: "PDF"
+    },
+    // Reference materials
+    {
+      id: 8,
+      type: 'reference',
+      title: "Science Project Ideas",
+      description: "Collection of science project ideas suitable for school exhibitions",
+      subject: "Science",
+      category: "Projects",
+      fileSize: "5 MB",
+      format: "PDF"
+    },
+    {
+      id: 9,
+      type: 'reference',
+      title: "Mathematical Formulas Handbook",
+      description: "Complete collection of mathematical formulas for all grades",
+      subject: "Mathematics",
+      category: "Reference",
       fileSize: "4 MB",
       format: "PDF"
-    }
+    },
+    {
+      id: 10,
+      type: 'reference',
+      title: "English Writing Styles Guide",
+      description: "Guide to different writing styles and essay formats",
+      subject: "English",
+      category: "Guide",
+      fileSize: "3 MB",
+      format: "DOCX"
+    },
   ];
-  
-  const getCurrentData = () => {
-    switch (activeTab) {
-      case "textbooks":
-        return textbooks;
-      case "questionPapers":
-        return questionPapers;
-      case "resourceGuides":
-        return resourceGuides;
-      default:
-        return textbooks;
-    }
-  };
-  
-  const filteredData = getCurrentData().filter(item => 
-    (classFilter === "all" || item.class === classFilter) &&
-    (subjectFilter === "all" || item.subject === subjectFilter) &&
-    (searchQuery === "" || 
-     item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-     item.description.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
-  
+
+  // Filter logic
+  const filteredMaterials = studyMaterials.filter(material => {
+    // Search query filter
+    const matchesSearch = material.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      material.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      material.subject.toLowerCase().includes(searchQuery.toLowerCase());
+
+    // Subject filter
+    const matchesSubject = !selectedSubject || material.subject === selectedSubject;
+    
+    // Format filter
+    const matchesFormat = !selectedFormat || material.format === selectedFormat;
+    
+    return matchesSearch && matchesSubject && matchesFormat;
+  });
+
+  // Extract unique subjects and formats for filters
+  const subjects = Array.from(new Set(studyMaterials.map(material => material.subject)));
+  const formats = Array.from(new Set(studyMaterials.map(material => material.format)));
+
   return (
-    <div className="space-y-6">
-      <motion.div 
+    <div className="container py-8">
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
-            <h1 className="text-3xl font-bold">Study Materials</h1>
-            <p className="text-muted-foreground">Access textbooks, question papers, and resources</p>
+            <h1 className="text-3xl font-bold mb-2">Study Materials</h1>
+            <p className="text-muted-foreground">Access textbooks, previous year papers, and reference materials</p>
           </div>
-          <Button variant="outline">
-            <BookmarkPlus className="mr-2 h-4 w-4" />
-            View Bookmarks
-          </Button>
         </div>
-      </motion.div>
-      
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-3 w-full md:w-[500px]">
-          <TabsTrigger value="textbooks">Textbooks</TabsTrigger>
-          <TabsTrigger value="questionPapers">Question Papers</TabsTrigger>
-          <TabsTrigger value="resourceGuides">Resource Guides</TabsTrigger>
-        </TabsList>
-        
-        <div className="my-4">
-          <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-            <div className="flex items-center justify-between">
-              <div className="relative flex-grow">
-                <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Search study materials..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-8"
-                />
-              </div>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm" className="ml-2">
-                  <Filter className="h-4 w-4 mr-1" />
-                  Filters
-                  <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+
+        <div className="flex flex-col md:flex-row gap-4 my-6">
+          <div className="relative flex-grow">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search for study materials..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <div className="flex gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex gap-2">
+                  <Filter className="h-4 w-4" />
+                  Subject
+                  <ChevronDown className="h-4 w-4" />
                 </Button>
-              </CollapsibleTrigger>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setSelectedSubject(null)}>
+                  All Subjects
+                </DropdownMenuItem>
+                {subjects.map(subject => (
+                  <DropdownMenuItem key={subject} onClick={() => setSelectedSubject(subject)}>
+                    {subject}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex gap-2">
+                  <Filter className="h-4 w-4" />
+                  Format
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setSelectedFormat(null)}>
+                  All Formats
+                </DropdownMenuItem>
+                {formats.map(format => (
+                  <DropdownMenuItem key={format} onClick={() => setSelectedFormat(format)}>
+                    {format}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+
+        {selectedSubject && (
+          <Badge variant="outline" className="mb-4 p-2">
+            Subject: {selectedSubject}
+            <Button variant="ghost" className="h-4 w-4 p-0 ml-2" onClick={() => setSelectedSubject(null)}>
+              ×
+            </Button>
+          </Badge>
+        )}
+
+        {selectedFormat && (
+          <Badge variant="outline" className="mb-4 ml-2 p-2">
+            Format: {selectedFormat}
+            <Button variant="ghost" className="h-4 w-4 p-0 ml-2" onClick={() => setSelectedFormat(null)}>
+              ×
+            </Button>
+          </Badge>
+        )}
+
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList className="mb-4">
+            <TabsTrigger value="all">All Materials</TabsTrigger>
+            <TabsTrigger value="textbooks">Textbooks</TabsTrigger>
+            <TabsTrigger value="papers">Previous Year Papers</TabsTrigger>
+            <TabsTrigger value="reference">Reference Materials</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="all" className="space-y-4">
+            {filteredMaterials.length === 0 ? (
+              <div className="text-center py-10">
+                <Book className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-medium">No study materials found</h3>
+                <p className="mt-2 text-muted-foreground">Try adjusting your search or filters</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredMaterials.map((material) => (
+                  <Card key={material.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <CardHeader className="pb-4">
+                      <div className="flex justify-between items-start">
+                        <CardTitle className="text-lg">{material.title}</CardTitle>
+                        <Badge>{material.format}</Badge>
+                      </div>
+                      <CardDescription>{material.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pb-4">
+                      <div className="flex flex-col space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Subject:</span>
+                          <span className="font-medium">{material.subject}</span>
+                        </div>
+                        {material.type === 'textbook' && (
+                          <>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Class:</span>
+                              <span className="font-medium">{material.className}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Source:</span>
+                              <span className="font-medium">{material.source}</span>
+                            </div>
+                          </>
+                        )}
+                        {material.type === 'paper' && (
+                          <>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Class:</span>
+                              <span className="font-medium">{material.className}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Year:</span>
+                              <span className="font-medium">{material.year}</span>
+                            </div>
+                          </>
+                        )}
+                        {material.type === 'reference' && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Category:</span>
+                            <span className="font-medium">{material.category}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Size:</span>
+                          <span className="font-medium">{material.fileSize}</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                    <CardFooter>
+                      <Button className="w-full">
+                        <Download className="mr-2 h-4 w-4" /> Download
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="textbooks" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredMaterials
+                .filter(material => material.type === 'textbook')
+                .map(material => (
+                  // Render textbook card (same structure as above)
+                  <Card key={material.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <CardHeader className="pb-4">
+                      <div className="flex justify-between items-start">
+                        <CardTitle className="text-lg">{material.title}</CardTitle>
+                        <Badge>{material.format}</Badge>
+                      </div>
+                      <CardDescription>{material.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pb-4">
+                      <div className="flex flex-col space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Subject:</span>
+                          <span className="font-medium">{material.subject}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Class:</span>
+                          <span className="font-medium">{material.className}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Source:</span>
+                          <span className="font-medium">{material.source}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Size:</span>
+                          <span className="font-medium">{material.fileSize}</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                    <CardFooter>
+                      <Button className="w-full">
+                        <Download className="mr-2 h-4 w-4" /> Download
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
             </div>
-            
-            <CollapsibleContent className="mt-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Select value={classFilter} onValueChange={setClassFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Class" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Classes</SelectItem>
-                      <SelectItem value="Class IX">Class IX</SelectItem>
-                      <SelectItem value="Class X">Class X</SelectItem>
-                      <SelectItem value="Class XI">Class XI</SelectItem>
-                      <SelectItem value="Class XII">Class XII</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Select value={subjectFilter} onValueChange={setSubjectFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Subject" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Subjects</SelectItem>
-                      <SelectItem value="Mathematics">Mathematics</SelectItem>
-                      <SelectItem value="Science">Science</SelectItem>
-                      <SelectItem value="English">English</SelectItem>
-                      <SelectItem value="Social Science">Social Science</SelectItem>
-                      <SelectItem value="Multiple">Multiple</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button variant="outline" onClick={() => {
-                  setClassFilter("all");
-                  setSubjectFilter("all");
-                  setSearchQuery("");
-                }}>
-                  Clear Filters
-                </Button>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-        </div>
-        
-        <TabsContent value="textbooks">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-1 md:grid-cols-2 gap-4"
-          >
-            {filteredData.map((item) => (
-              <motion.div key={item.id} variants={itemVariants}>
-                <Card className="module-card card-hover">
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between">
-                      <Badge variant="outline" className="bg-edubridge-blue/10 text-edubridge-blue border-edubridge-blue/30">
-                        {item.subject}
-                      </Badge>
-                      <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/30">
-                        {item.source}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex gap-4">
-                      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 h-fit">
-                        <BookOpen className="h-6 w-6 text-edubridge-blue" />
+          </TabsContent>
+          
+          <TabsContent value="papers" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredMaterials
+                .filter(material => material.type === 'paper')
+                .map(material => (
+                  // Render papers card
+                  <Card key={material.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <CardHeader className="pb-4">
+                      <div className="flex justify-between items-start">
+                        <CardTitle className="text-lg">{material.title}</CardTitle>
+                        <Badge>{material.format}</Badge>
                       </div>
-                      <div>
-                        <h3 className="font-medium text-lg">{item.title}</h3>
-                        <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
-                        <div className="flex items-center gap-3 mt-2">
-                          <span className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            {item.class}
-                          </span>
-                          <span className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            {item.format}
-                          </span>
-                          <span className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            {item.fileSize}
-                          </span>
+                      <CardDescription>{material.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pb-4">
+                      <div className="flex flex-col space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Subject:</span>
+                          <span className="font-medium">{material.subject}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Class:</span>
+                          <span className="font-medium">{material.className}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Year:</span>
+                          <span className="font-medium">{material.year}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Size:</span>
+                          <span className="font-medium">{material.fileSize}</span>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex justify-end gap-2">
-                    <Button variant="outline" size="sm">
-                      <BookmarkPlus className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm">
-                      <Download className="mr-2 h-4 w-4" />
-                      Download
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        </TabsContent>
-        
-        <TabsContent value="questionPapers">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-1 md:grid-cols-2 gap-4"
-          >
-            {filteredData.map((item) => (
-              <motion.div key={item.id} variants={itemVariants}>
-                <Card className="module-card card-hover">
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between">
-                      <Badge variant="outline" className="bg-edubridge-blue/10 text-edubridge-blue border-edubridge-blue/30">
-                        {item.subject}
-                      </Badge>
-                      <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/30">
-                        {item.year}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex gap-4">
-                      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 h-fit">
-                        <FileText className="h-6 w-6 text-edubridge-blue" />
+                    </CardContent>
+                    <CardFooter>
+                      <Button className="w-full">
+                        <Download className="mr-2 h-4 w-4" /> Download
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="reference" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredMaterials
+                .filter(material => material.type === 'reference')
+                .map(material => (
+                  // Render reference materials card
+                  <Card key={material.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <CardHeader className="pb-4">
+                      <div className="flex justify-between items-start">
+                        <CardTitle className="text-lg">{material.title}</CardTitle>
+                        <Badge>{material.format}</Badge>
                       </div>
-                      <div>
-                        <h3 className="font-medium text-lg">{item.title}</h3>
-                        <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
-                        <div className="flex items-center gap-3 mt-2">
-                          <span className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            {item.class}
-                          </span>
-                          <span className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            {item.format}
-                          </span>
-                          <span className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            {item.fileSize}
-                          </span>
+                      <CardDescription>{material.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pb-4">
+                      <div className="flex flex-col space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Subject:</span>
+                          <span className="font-medium">{material.subject}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Category:</span>
+                          <span className="font-medium">{material.category}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Size:</span>
+                          <span className="font-medium">{material.fileSize}</span>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex justify-end gap-2">
-                    <Button variant="outline" size="sm">
-                      <BookmarkPlus className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm">
-                      <Download className="mr-2 h-4 w-4" />
-                      Download
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        </TabsContent>
-        
-        <TabsContent value="resourceGuides">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-1 md:grid-cols-2 gap-4"
-          >
-            {filteredData.map((item) => (
-              <motion.div key={item.id} variants={itemVariants}>
-                <Card className="module-card card-hover">
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between">
-                      <Badge variant="outline" className="bg-edubridge-purple/10 text-edubridge-purple border-edubridge-purple/30">
-                        {item.category}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex gap-4">
-                      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 h-fit">
-                        <BookOpen className="h-6 w-6 text-edubridge-purple" />
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-lg">{item.title}</h3>
-                        <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
-                        <div className="flex items-center gap-3 mt-2">
-                          <span className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            {item.subject}
-                          </span>
-                          <span className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            {item.format}
-                          </span>
-                          <span className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            {item.fileSize}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex justify-end gap-2">
-                    <Button variant="outline" size="sm">
-                      <BookmarkPlus className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm">
-                      <Download className="mr-2 h-4 w-4" />
-                      Download
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        </TabsContent>
-      </Tabs>
+                    </CardContent>
+                    <CardFooter>
+                      <Button className="w-full">
+                        <Download className="mr-2 h-4 w-4" /> Download
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </motion.div>
     </div>
   );
 };

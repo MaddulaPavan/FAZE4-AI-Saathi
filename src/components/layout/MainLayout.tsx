@@ -1,10 +1,11 @@
 
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Sidebar, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { Button } from "@/components/ui/button";
-import { Bell, LogOut, Menu } from "lucide-react";
+import { Bell, LogOut, Menu, Home } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -17,6 +18,7 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const { user, logout } = useAuth();
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
 
   // Fix for hydration issues
@@ -61,10 +63,19 @@ export function MainLayout({ children }: MainLayoutProps) {
                   </SheetContent>
                 </Sheet>
               )}
-              <h1 className="text-lg font-medium hidden sm:block">EduBridge</h1>
+              <h1 className="text-lg font-medium hidden sm:block">AI Saathi</h1>
             </div>
             
             <div className="flex items-center gap-2">
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => navigate('/home')}
+              >
+                <Home className="h-5 w-5" />
+                <span className="sr-only">Home</span>
+              </Button>
+              
               <Button variant="ghost" size="icon">
                 <Bell className="h-5 w-5" />
                 <span className="sr-only">Notifications</span>

@@ -209,7 +209,7 @@ export function AppSidebar() {
     <Sidebar>
       <div className="py-4 px-2">
         <div className="flex items-center justify-center mb-6">
-          <div className="text-2xl font-bold text-edubridge-purple">EduBridge</div>
+          <div className="text-2xl font-bold text-edubridge-purple">AI Saathi</div>
         </div>
       </div>
       <SidebarContent className="px-2">

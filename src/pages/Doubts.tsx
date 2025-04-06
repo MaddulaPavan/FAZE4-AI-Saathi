@@ -1,274 +1,482 @@
 
 import { useState } from "react";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { HelpCircle, MessageCircle, Search, Filter, PlusCircle, Calendar, Clock } from "lucide-react";
 import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  HelpCircle,
+  Search,
+  Clock,
+  CheckCircle2,
+  MessageSquare,
+  Filter,
+  ChevronDown,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+interface Doubt {
+  id: string;
+  title: string;
+  question: string;
+  subject: string;
+  status: "answered" | "pending";
+  date: string;
+  attachments?: number;
+  answers?: {
+    id: string;
+    user: {
+      name: string;
+      avatar?: string;
+    };
+    text: string;
+    date: string;
+    isVerified?: boolean;
+  }[];
+}
 
 const Doubts = () => {
-  const [activeTab, setActiveTab] = useState("browse");
+  const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [subjectFilter, setSubjectFilter] = useState("all");
-  
-  const doubtQuestions = [
+  const [showAskForm, setShowAskForm] = useState(false);
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+
+  // Sample doubts data
+  const doubts: Doubt[] = [
     {
-      id: 1,
-      question: "How do we solve quadratic equations using the discriminant?",
+      id: "1",
+      title: "How do I solve quadratic equations?",
+      question:
+        "I'm struggling with solving quadratic equations. Can someone explain the step-by-step process to solve equations like x² + 5x + 6 = 0?",
       subject: "Mathematics",
-      topic: "Algebra",
-      askedBy: "Rahul S.",
-      date: "Today, 10:23 AM",
-      replies: 2,
-      status: "answered"
+      status: "answered",
+      date: "2023-12-10",
+      attachments: 1,
+      answers: [
+        {
+          id: "a1",
+          user: {
+            name: "Priya Sharma",
+            avatar: "/placeholder.svg",
+          },
+          text: "To solve a quadratic equation like x² + 5x + 6 = 0, you can use factoring. First, find two numbers that multiply to give 6 and add up to 5. Those numbers are 2 and 3. So we can rewrite the equation as (x + 2)(x + 3) = 0. Therefore, x = -2 or x = -3.",
+          date: "2023-12-11",
+          isVerified: true,
+        },
+      ],
     },
     {
-      id: 2,
-      question: "What is the difference between velocity and acceleration?",
-      subject: "Physics",
-      topic: "Motion",
-      askedBy: "Priya K.",
-      date: "Yesterday",
-      replies: 3,
-      status: "answered"
+      id: "2",
+      title: "What is photosynthesis?",
+      question:
+        "Can someone explain the process of photosynthesis in simple terms? What are the inputs and outputs?",
+      subject: "Science",
+      status: "answered",
+      date: "2023-12-08",
+      answers: [
+        {
+          id: "a2",
+          user: {
+            name: "Rahul Verma",
+            avatar: "/placeholder.svg",
+          },
+          text: "Photosynthesis is the process by which plants create their own food. They use sunlight, water, and carbon dioxide to create glucose (sugar) and oxygen. The sunlight is captured by chlorophyll in the plant's leaves. The equation is: 6CO₂ + 6H₂O + sunlight → C₆H₁₂O₆ + 6O₂",
+          date: "2023-12-09",
+          isVerified: true,
+        },
+      ],
     },
     {
-      id: 3,
-      question: "How do I properly structure a persuasive essay?",
+      id: "3",
+      title: "How to analyze a poem?",
+      question:
+        "I need to analyze a poem for my English class but I'm not sure where to start. What elements should I focus on?",
       subject: "English",
-      topic: "Writing",
-      askedBy: "Amit R.",
-      date: "April 3, 2025",
-      replies: 1,
-      status: "answered"
+      status: "pending",
+      date: "2023-12-12",
     },
     {
-      id: 4,
-      question: "What are the key features of object-oriented programming?",
-      subject: "Computer Science",
-      topic: "Programming",
-      askedBy: "Neha P.",
-      date: "April 2, 2025",
-      replies: 0,
-      status: "pending"
-    }
-  ];
-
-  const myDoubts = [
-    {
-      id: 5,
-      question: "How do I calculate the area of a triangle using vectors?",
-      subject: "Mathematics",
-      topic: "Vectors",
-      date: "April 1, 2025",
-      replies: 2,
-      status: "answered"
+      id: "4",
+      title: "What caused World War I?",
+      question:
+        "I'm confused about the causes of World War I. Can someone explain the main factors that led to the war?",
+      subject: "History",
+      status: "answered",
+      date: "2023-12-07",
+      answers: [
+        {
+          id: "a3",
+          user: {
+            name: "Amit Kumar",
+            avatar: "/placeholder.svg",
+          },
+          text: "World War I was caused by several interconnected factors: nationalism, militarism, imperialism, and alliance systems. The immediate trigger was the assassination of Archduke Franz Ferdinand of Austria-Hungary in June 1914. This set off a chain reaction due to the complex alliance systems in place at the time.",
+          date: "2023-12-08",
+          isVerified: false,
+        },
+      ],
     },
     {
-      id: 6,
-      question: "What is the process of photosynthesis?",
-      subject: "Biology",
-      topic: "Plant Physiology",
-      date: "March 28, 2025",
-      replies: 1,
-      status: "answered"
-    }
+      id: "5",
+      title: "How does Newton's Third Law work?",
+      question:
+        "I'm having trouble understanding Newton's Third Law. Can someone provide examples?",
+      subject: "Physics",
+      status: "pending",
+      date: "2023-12-11",
+    },
   ];
-  
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { 
-        staggerChildren: 0.1
-      }
-    }
+
+  // Filter doubts based on search query and filters
+  const filteredDoubts = doubts.filter((doubt) => {
+    const matchesSearch =
+      doubt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doubt.question.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesStatus =
+      !selectedStatus || 
+      (selectedStatus === "answered" && doubt.status === "answered") || 
+      (selectedStatus === "pending" && doubt.status === "pending");
+    
+    const matchesSubject =
+      !selectedSubject || doubt.subject === selectedSubject;
+    
+    const matchesTab =
+      activeTab === "all" ||
+      (activeTab === "answered" && doubt.status === "answered") ||
+      (activeTab === "pending" && doubt.status === "pending");
+    
+    return matchesSearch && matchesStatus && matchesSubject && matchesTab;
+  });
+
+  // Get unique subjects for the filter
+  const subjects = Array.from(new Set(doubts.map((doubt) => doubt.subject)));
+
+  const renderDoubtCard = (doubt: Doubt) => {
+    return (
+      <motion.div
+        key={doubt.id}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Card className="mb-4 hover:shadow-md transition-shadow">
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle>{doubt.title}</CardTitle>
+                <CardDescription className="mt-1">
+                  Posted on {new Date(doubt.date).toLocaleDateString()}
+                </CardDescription>
+              </div>
+              <Badge variant={doubt.status === "answered" ? "success" : "outline"}>
+                {doubt.status === "answered" ? (
+                  <CheckCircle2 className="w-3 h-3 mr-1" />
+                ) : (
+                  <Clock className="w-3 h-3 mr-1" />
+                )}
+                {doubt.status === "answered" ? "Answered" : "Pending"}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div>
+              <p className="mb-4">{doubt.question}</p>
+              <div className="flex flex-wrap gap-2 mt-2">
+                <Badge variant="outline">{doubt.subject}</Badge>
+                {doubt.attachments && (
+                  <Badge variant="outline">
+                    {doubt.attachments} attachment
+                    {doubt.attachments > 1 ? "s" : ""}
+                  </Badge>
+                )}
+              </div>
+            </div>
+            
+            {doubt.answers && doubt.answers.length > 0 && (
+              <div className="mt-6 border-t pt-4">
+                <h4 className="font-medium mb-3 flex items-center">
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Answer{doubt.answers.length > 1 ? "s" : ""}
+                </h4>
+                {doubt.answers.map((answer) => (
+                  <div key={answer.id} className="flex gap-3 mb-3">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={answer.user.avatar} />
+                      <AvatarFallback>
+                        {answer.user.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{answer.user.name}</span>
+                        {answer.isVerified && (
+                          <Badge variant="secondary" className="text-xs">
+                            Verified Mentor
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="mt-1">{answer.text}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {new Date(answer.date).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+          <CardFooter className="border-t pt-4 pb-4">
+            <Button variant="outline" className="w-full">
+              {doubt.status === "answered" ? "View Discussion" : "Answer This Question"}
+            </Button>
+          </CardFooter>
+        </Card>
+      </motion.div>
+    );
   };
 
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
-      opacity: 1,
-      transition: { 
-        type: "spring",
-        stiffness: 100
-      }
-    }
-  };
-
-  const filteredDoubts = activeTab === "my-doubts" 
-    ? myDoubts
-    : doubtQuestions.filter(doubt => 
-        (subjectFilter === "all" || doubt.subject === subjectFilter) &&
-        (searchQuery === "" || 
-         doubt.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-         doubt.topic.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
-  
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">Doubt System</h1>
-          <p className="text-muted-foreground">Get your questions answered by mentors</p>
+    <div className="container py-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Doubt System</h1>
+            <p className="text-muted-foreground">Ask questions and get answers from peers and mentors</p>
+          </div>
+          <Button
+            onClick={() => setShowAskForm(!showAskForm)}
+            className="mt-4 md:mt-0"
+          >
+            Ask a Question
+          </Button>
         </div>
-        <Button className="bg-edubridge-blue">
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Post New Doubt
-        </Button>
-      </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-2 md:w-[400px]">
-          <TabsTrigger value="browse">Browse Questions</TabsTrigger>
-          <TabsTrigger value="my-doubts">My Doubts</TabsTrigger>
-        </TabsList>
+        {showAskForm && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-8"
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle>Ask a New Question</CardTitle>
+                <CardDescription>
+                  Provide details about your question to get accurate answers
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="title" className="block text-sm font-medium mb-2">
+                      Question Title
+                    </label>
+                    <Input
+                      id="title"
+                      placeholder="Enter a clear, specific title for your question"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="question" className="block text-sm font-medium mb-2">
+                      Question Details
+                    </label>
+                    <Textarea
+                      id="question"
+                      placeholder="Describe your question in detail. Include what you've tried already."
+                      className="min-h-[120px]"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="subject" className="block text-sm font-medium mb-2">
+                      Subject
+                    </label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a subject" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="mathematics">Mathematics</SelectItem>
+                        <SelectItem value="science">Science</SelectItem>
+                        <SelectItem value="english">English</SelectItem>
+                        <SelectItem value="history">History</SelectItem>
+                        <SelectItem value="physics">Physics</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label htmlFor="attachment" className="block text-sm font-medium mb-2">
+                      Attachment (Optional)
+                    </label>
+                    <Input id="attachment" type="file" />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      You can attach images, PDFs, or other files (max. 5MB)
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setShowAskForm(false)}>
+                  Cancel
+                </Button>
+                <Button>Submit Question</Button>
+              </CardFooter>
+            </Card>
+          </motion.div>
+        )}
 
-        <div className="my-4 flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col md:flex-row gap-4 my-6">
           <div className="relative flex-grow">
-            <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search questions..."
+              placeholder="Search for questions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8"
+              className="pl-10"
             />
           </div>
           <div className="flex gap-2">
-            <Select value={subjectFilter} onValueChange={setSubjectFilter}>
-              <SelectTrigger className="w-[180px]">
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Filter by subject" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Subjects</SelectItem>
-                <SelectItem value="Mathematics">Mathematics</SelectItem>
-                <SelectItem value="Physics">Physics</SelectItem>
-                <SelectItem value="Chemistry">Chemistry</SelectItem>
-                <SelectItem value="Biology">Biology</SelectItem>
-                <SelectItem value="English">English</SelectItem>
-                <SelectItem value="Computer Science">Computer Science</SelectItem>
-              </SelectContent>
-            </Select>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex gap-2">
+                  <Filter className="h-4 w-4" />
+                  Subject
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setSelectedSubject(null)}>
+                  All Subjects
+                </DropdownMenuItem>
+                {subjects.map((subject) => (
+                  <DropdownMenuItem
+                    key={subject}
+                    onClick={() => setSelectedSubject(subject)}
+                  >
+                    {subject}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex gap-2">
+                  <Filter className="h-4 w-4" />
+                  Status
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setSelectedStatus(null)}>
+                  All Statuses
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedStatus("answered")}>
+                  Answered
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedStatus("pending")}>
+                  Pending
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
-        <TabsContent value="browse">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="space-y-4"
-          >
+        <Tabs
+          defaultValue="all"
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full"
+        >
+          <TabsList className="mb-4">
+            <TabsTrigger value="all">All Questions</TabsTrigger>
+            <TabsTrigger value="answered">Answered</TabsTrigger>
+            <TabsTrigger value="pending">Pending</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="all">
             {filteredDoubts.length === 0 ? (
-              <div className="text-center py-12">
-                <HelpCircle className="mx-auto h-12 w-12 text-muted-foreground opacity-50 mb-4" />
-                <h3 className="text-lg font-medium">No questions found</h3>
-                <p className="text-muted-foreground">Try adjusting your search or filters</p>
+              <div className="text-center py-10">
+                <HelpCircle className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-medium">No questions found</h3>
+                <p className="mt-2 text-muted-foreground">
+                  Try adjusting your search or filters, or ask a new question
+                </p>
               </div>
             ) : (
-              filteredDoubts.map((doubt) => (
-                <motion.div key={doubt.id} variants={itemVariants}>
-                  <Card className="module-card card-hover">
-                    <CardHeader className="pb-2">
-                      <div className="flex justify-between">
-                        <Badge variant="outline" className="bg-edubridge-blue/10 text-edubridge-blue border-edubridge-blue/30">
-                          {doubt.subject}
-                        </Badge>
-                        <Badge variant={doubt.status === "answered" ? "outline" : "secondary"} className={
-                          doubt.status === "answered" 
-                            ? "bg-green-500/10 text-green-600 border-green-500/30" 
-                            : "bg-yellow-500/10 text-yellow-600 border-yellow-500/30"
-                        }>
-                          {doubt.status === "answered" ? "Answered" : "Pending"}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <h3 className="font-medium text-lg">{doubt.question}</h3>
-                      <div className="mt-2 space-y-1 text-sm text-muted-foreground">
-                        <div className="flex items-center">
-                          <MessageCircle className="h-4 w-4 mr-2" />
-                          <span>Topic: {doubt.topic}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <Calendar className="h-4 w-4 mr-2" />
-                          <span>Posted: {doubt.date}</span>
-                        </div>
-                        {'askedBy' in doubt && (
-                          <div className="flex items-center">
-                            <Clock className="h-4 w-4 mr-2" />
-                            <span>By: {doubt.askedBy}</span>
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                    <CardFooter className="flex justify-between">
-                      <div className="text-sm text-muted-foreground">
-                        {doubt.replies} {doubt.replies === 1 ? "reply" : "replies"}
-                      </div>
-                      <Button variant="outline">View Thread</Button>
-                    </CardFooter>
-                  </Card>
-                </motion.div>
-              ))
+              filteredDoubts.map(renderDoubtCard)
             )}
-          </motion.div>
-        </TabsContent>
+          </TabsContent>
 
-        <TabsContent value="my-doubts">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="space-y-4"
-          >
-            {myDoubts.map((doubt) => (
-              <motion.div key={doubt.id} variants={itemVariants}>
-                <Card className="module-card card-hover">
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between">
-                      <Badge variant="outline" className="bg-edubridge-blue/10 text-edubridge-blue border-edubridge-blue/30">
-                        {doubt.subject}
-                      </Badge>
-                      <Badge variant={doubt.status === "answered" ? "outline" : "secondary"} className={
-                        doubt.status === "answered" 
-                          ? "bg-green-500/10 text-green-600 border-green-500/30" 
-                          : "bg-yellow-500/10 text-yellow-600 border-yellow-500/30"
-                      }>
-                        {doubt.status === "answered" ? "Answered" : "Pending"}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <h3 className="font-medium text-lg">{doubt.question}</h3>
-                    <div className="mt-2 space-y-1 text-sm text-muted-foreground">
-                      <div className="flex items-center">
-                        <MessageCircle className="h-4 w-4 mr-2" />
-                        <span>Topic: {doubt.topic}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Calendar className="h-4 w-4 mr-2" />
-                        <span>Posted: {doubt.date}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex justify-between">
-                    <div className="text-sm text-muted-foreground">
-                      {doubt.replies} {doubt.replies === 1 ? "reply" : "replies"}
-                    </div>
-                    <Button variant="outline">View Thread</Button>
-                  </CardFooter>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="answered">
+            {filteredDoubts.filter((d) => d.status === "answered").length === 0 ? (
+              <div className="text-center py-10">
+                <CheckCircle2 className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-medium">No answered questions found</h3>
+                <p className="mt-2 text-muted-foreground">
+                  Try adjusting your search or filters
+                </p>
+              </div>
+            ) : (
+              filteredDoubts
+                .filter((d) => d.status === "answered")
+                .map(renderDoubtCard)
+            )}
+          </TabsContent>
+
+          <TabsContent value="pending">
+            {filteredDoubts.filter((d) => d.status === "pending").length === 0 ? (
+              <div className="text-center py-10">
+                <Clock className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-medium">No pending questions found</h3>
+                <p className="mt-2 text-muted-foreground">
+                  Try adjusting your search or filters
+                </p>
+              </div>
+            ) : (
+              filteredDoubts
+                .filter((d) => d.status === "pending")
+                .map(renderDoubtCard)
+            )}
+          </TabsContent>
+        </Tabs>
+      </motion.div>
     </div>
   );
 };

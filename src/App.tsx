@@ -9,6 +9,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { MainLayout } from "@/components/layout/MainLayout";
 import Auth from "./pages/Auth";
 import Index from "./pages/Index";  // Make sure to display the index page
+import Home from "./pages/Home";  // New home page
 import Dashboard from "./pages/Dashboard";
 import LMS from "./pages/LMS";
 import Communication from "./pages/Communication";
@@ -56,6 +57,7 @@ const App = () => {
               <Sonner />
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/home" element={<Home />} />
                 <Route path="/auth" element={<Auth />} />
                 
                 {/* Protected Routes */}

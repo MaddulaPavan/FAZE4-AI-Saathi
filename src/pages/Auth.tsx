@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { RoleSelection } from '@/components/auth/RoleSelection';
 import { LoginForm } from '@/components/auth/LoginForm';
@@ -9,10 +9,24 @@ import { UserRole } from '@/types';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 
+interface LocationState {
+  selectedRole?: UserRole;
+}
+
 const Auth = () => {
   const [step, setStep] = useState<'role' | 'login' | 'signup'>('role');
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const { user } = useAuth();
+  const location = useLocation();
+  const state = location.state as LocationState | undefined;
+  
+  // Effect to check if a role was passed from the home page
+  useEffect(() => {
+    if (state?.selectedRole) {
+      setSelectedRole(state.selectedRole as UserRole);
+      setStep('login');
+    }
+  }, [state]);
   
   if (user) {
     return <Navigate to="/dashboard" />;
@@ -69,7 +83,7 @@ const Auth = () => {
         >
           <div className="flex justify-center mb-4">
             <div className="bg-gradient-to-br from-edubridge-blue to-edubridge-purple p-3 rounded-2xl shadow-lg">
-              <div className="text-4xl font-bold text-white">EduBridge</div>
+              <div className="text-4xl font-bold text-white">AI Saathi</div>
             </div>
           </div>
           <p className="text-muted-foreground">Empowering rural education in India</p>
@@ -110,7 +124,7 @@ const Auth = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          By using EduBridge, you agree to our Terms of Service and Privacy Policy
+          By using AI Saathi, you agree to our Terms of Service and Privacy Policy
         </motion.p>
       </div>
     </div>

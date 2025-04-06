@@ -1,699 +1,1126 @@
 
 import { useState } from "react";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Search, Briefcase, MapPin, Building, Calendar, Clock, ExternalLink, Filter, Upload } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Briefcase,
+  MapPin,
+  Search,
+  Building,
+  Calendar,
+  GraduationCap,
+  BookOpen,
+  Filter,
+  ChevronDown,
+  Clock,
+  Download,
+  FileText as FileTextIcon,
+  ExternalLink,
+  AlertCircle,
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
+type JobType = "internship" | "full-time" | "part-time";
+
+interface Job {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  type: JobType;
+  salary?: string;
+  description: string;
+  requirements: string[];
+  posted: string; // ISO date string
+  deadline?: string; // ISO date string
+}
+
+interface Workshop {
+  id: string;
+  title: string;
+  organizer: string;
+  date: string; // ISO date string
+  duration: string;
+  type: "online" | "offline";
+  location?: string;
+  description: string;
+  skillsTaught: string[];
+  registration?: {
+    deadline: string; // ISO date string
+    url: string;
+    fee?: string;
+  };
+}
+
+interface Course {
+  id: string;
+  title: string;
+  provider: string;
+  skillLevel: "beginner" | "intermediate" | "advanced";
+  duration: string;
+  certificate: boolean;
+  skills: string[];
+  description: string;
+  enrolled: number;
+  rating: number;
+}
+
+interface ResumeTemplate {
+  id: string;
+  name: string;
+  category: string;
+  imageUrl: string;
+  downloadUrl: string;
+  format: string;
+}
 
 const Employment = () => {
-  const [activeTab, setActiveTab] = useState("jobs");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [locationFilter, setLocationFilter] = useState("all");
-  const [typeFilter, setTypeFilter] = useState("all");
-  const [showUploadDialog, setShowUploadDialog] = useState(false);
-  const [showApplyDialog, setShowApplyDialog] = useState(false);
-  const [selectedJob, setSelectedJob] = useState<any>(null);
-  
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { 
-        staggerChildren: 0.1
-      }
-    }
-  };
+  const [jobSearchQuery, setJobSearchQuery] = useState("");
+  const [selectedJobType, setSelectedJobType] = useState<string | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const [workshopSearchQuery, setWorkshopSearchQuery] = useState("");
+  const [selectedWorkshopType, setSelectedWorkshopType] = useState<string | null>(null);
+  const [courseSearchQuery, setCourseSearchQuery] = useState("");
+  const [selectedSkillLevel, setSelectedSkillLevel] = useState<string | null>(null);
 
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
-      opacity: 1,
-      transition: { 
-        type: "spring",
-        stiffness: 100
-      }
-    }
-  };
-  
-  const jobListings = [
+  // Sample data
+  const jobs: Job[] = [
     {
-      id: 1,
-      title: "Junior Software Developer",
+      id: "j1",
+      title: "Junior Web Developer",
       company: "TechSolutions India",
       location: "Bangalore",
-      type: "Full-time",
-      salary: "₹4,00,000 - ₹6,00,000 per annum",
-      postedDate: "2 days ago",
-      skills: ["HTML", "CSS", "JavaScript", "React"],
-      description: "Entry-level software developer position for fresh graduates with knowledge of web development technologies."
+      type: "full-time",
+      salary: "₹4,00,000 - ₹6,00,000 per year",
+      description:
+        "We are looking for a Junior Web Developer to join our growing team. You'll work on exciting projects for various clients while learning from senior developers.",
+      requirements: [
+        "Basic knowledge of HTML, CSS, and JavaScript",
+        "Understanding of responsive design principles",
+        "Knowledge of any one frontend framework (React, Angular, Vue)",
+        "Good communication skills",
+      ],
+      posted: "2023-11-15",
+      deadline: "2023-12-31",
     },
     {
-      id: 2,
-      title: "Data Entry Operator",
-      company: "ServiceNow BPO",
+      id: "j2",
+      title: "Data Entry Specialist",
+      company: "InfoProcess Services",
+      location: "Remote",
+      type: "part-time",
+      salary: "₹15,000 - ₹20,000 per month",
+      description:
+        "Looking for detail-oriented individuals for data entry work. Flexible hours and work-from-home opportunity.",
+      requirements: [
+        "Strong attention to detail",
+        "Fast typing speed (min. 40 wpm)",
+        "Basic computer skills",
+        "Reliable internet connection",
+      ],
+      posted: "2023-11-20",
+    },
+    {
+      id: "j3",
+      title: "Marketing Intern",
+      company: "GrowthMarketing Co.",
       location: "Delhi",
-      type: "Part-time",
-      salary: "₹12,000 - ₹15,000 per month",
-      postedDate: "1 week ago",
-      skills: ["MS Excel", "Typing", "Basic Computer Knowledge"],
-      description: "Looking for data entry operators with good typing speed and accuracy. Flexible working hours available."
+      type: "internship",
+      salary: "₹10,000 per month + incentives",
+      description:
+        "Join our marketing team as an intern and gain hands-on experience in digital marketing, content creation, and campaign management.",
+      requirements: [
+        "Currently pursuing a degree in Marketing, Communications, or related field",
+        "Interest in digital marketing",
+        "Good writing skills",
+        "Basic knowledge of social media platforms",
+      ],
+      posted: "2023-11-25",
+      deadline: "2023-12-15",
     },
     {
-      id: 3,
-      title: "Customer Support Executive",
-      company: "Global Services Ltd",
+      id: "j4",
+      title: "Customer Support Representative",
+      company: "ServiceFirst Solutions",
       location: "Mumbai",
-      type: "Full-time",
-      salary: "₹2,50,000 - ₹3,50,000 per annum",
-      postedDate: "3 days ago",
-      skills: ["English Communication", "Problem Solving", "Customer Service"],
-      description: "Customer support role requiring good communication skills and problem-solving abilities."
+      type: "full-time",
+      salary: "₹2,50,000 - ₹3,50,000 per year",
+      description:
+        "Join our customer support team to help customers resolve issues and provide excellent service through phone, email, and chat.",
+      requirements: [
+        "Excellent communication skills",
+        "Empathetic and patient attitude",
+        "Problem-solving ability",
+        "Fluent in English and Hindi",
+      ],
+      posted: "2023-11-18",
     },
     {
-      id: 4,
-      title: "Digital Marketing Intern",
-      company: "CreativeMinds Agency",
-      location: "Remote",
-      type: "Internship",
-      salary: "₹10,000 per month",
-      postedDate: "5 days ago",
-      skills: ["Social Media", "Content Creation", "Basic SEO"],
-      description: "Digital marketing internship opportunity for students interested in social media marketing and content creation."
+      id: "j5",
+      title: "Graphic Design Assistant",
+      company: "CreativeStrokes Media",
+      location: "Hyderabad",
+      type: "part-time",
+      salary: "₹18,000 - ₹25,000 per month",
+      description:
+        "Assist our senior designers in creating visual content for various clients, including social media graphics, branding materials, and more.",
+      requirements: [
+        "Basic knowledge of Adobe Photoshop and Illustrator",
+        "Good understanding of design principles",
+        "Ability to follow brand guidelines",
+        "Portfolio demonstrating your skills",
+      ],
+      posted: "2023-11-22",
+    },
+  ];
+
+  const workshops: Workshop[] = [
+    {
+      id: "w1",
+      title: "Introduction to Web Development",
+      organizer: "CodeCamp India",
+      date: "2023-12-15",
+      duration: "3 days",
+      type: "online",
+      description:
+        "Learn the basics of web development including HTML, CSS, and JavaScript in this hands-on workshop led by industry professionals.",
+      skillsTaught: ["HTML5", "CSS3", "JavaScript Basics", "Responsive Design"],
+      registration: {
+        deadline: "2023-12-10",
+        url: "https://example.com/webdev-workshop",
+        fee: "₹999",
+      },
+    },
+    {
+      id: "w2",
+      title: "Resume Building and Interview Skills",
+      organizer: "Career Connect",
+      date: "2023-12-05",
+      duration: "1 day",
+      type: "offline",
+      location: "Delhi Community Center",
+      description:
+        "A comprehensive workshop on crafting an effective resume and preparing for job interviews, including mock interviews and feedback sessions.",
+      skillsTaught: [
+        "Resume Writing",
+        "Interview Techniques",
+        "Personal Branding",
+        "Communication Skills",
+      ],
+      registration: {
+        deadline: "2023-12-01",
+        url: "https://example.com/resume-workshop",
+        fee: "₹499",
+      },
+    },
+    {
+      id: "w3",
+      title: "Digital Marketing Essentials",
+      organizer: "DigiGrowth Academy",
+      date: "2023-12-18",
+      duration: "2 days",
+      type: "online",
+      description:
+        "Dive into the world of digital marketing and learn strategies for social media, SEO, email marketing, and content creation.",
+      skillsTaught: [
+        "Social Media Marketing",
+        "SEO Basics",
+        "Email Campaigns",
+        "Content Strategy",
+      ],
+      registration: {
+        deadline: "2023-12-15",
+        url: "https://example.com/digital-marketing-workshop",
+        fee: "₹1,499",
+      },
+    },
+    {
+      id: "w4",
+      title: "Financial Literacy for Young Adults",
+      organizer: "MoneyWise Foundation",
+      date: "2023-12-10",
+      duration: "4 hours",
+      type: "offline",
+      location: "Mumbai Community Hall",
+      description:
+        "Learn essential financial skills including budgeting, saving, investments, and understanding credit in this practical workshop.",
+      skillsTaught: [
+        "Budgeting",
+        "Savings Strategies",
+        "Investment Basics",
+        "Credit Management",
+      ],
+      registration: {
+        deadline: "2023-12-08",
+        url: "https://example.com/financial-literacy-workshop",
+        fee: "₹299",
+      },
+    },
+    {
+      id: "w5",
+      title: "Mobile App Development with Flutter",
+      organizer: "TechSkills Academy",
+      date: "2023-12-20",
+      duration: "4 days",
+      type: "online",
+      description:
+        "A comprehensive workshop on building cross-platform mobile apps using Flutter framework. Build your first app by the end of the workshop!",
+      skillsTaught: [
+        "Dart Programming",
+        "Flutter Basics",
+        "UI Design",
+        "App Deployment",
+      ],
+      registration: {
+        deadline: "2023-12-18",
+        url: "https://example.com/flutter-workshop",
+        fee: "₹2,499",
+      },
+    },
+  ];
+
+  const courses: Course[] = [
+    {
+      id: "c1",
+      title: "Complete Web Development Bootcamp",
+      provider: "TechLearn Academy",
+      skillLevel: "beginner",
+      duration: "8 weeks",
+      certificate: true,
+      skills: ["HTML", "CSS", "JavaScript", "React", "Node.js"],
+      description:
+        "A comprehensive course that takes you from zero to full-stack web developer with hands-on projects and real-world applications.",
+      enrolled: 2456,
+      rating: 4.8,
+    },
+    {
+      id: "c2",
+      title: "Advanced Data Analysis with Python",
+      provider: "DataScience Pro",
+      skillLevel: "intermediate",
+      duration: "6 weeks",
+      certificate: true,
+      skills: ["Python", "Pandas", "NumPy", "Data Visualization", "Statistical Analysis"],
+      description:
+        "Master data analysis techniques using Python libraries and tools. Learn to extract insights from real-world datasets and create compelling visualizations.",
+      enrolled: 1872,
+      rating: 4.7,
+    },
+    {
+      id: "c3",
+      title: "Professional Communication Skills",
+      provider: "CareerBoost Education",
+      skillLevel: "beginner",
+      duration: "4 weeks",
+      certificate: true,
+      skills: [
+        "Public Speaking",
+        "Business Writing",
+        "Presentation Skills",
+        "Interpersonal Communication",
+      ],
+      description:
+        "Enhance your professional communication skills for workplace success. Perfect for students and early career professionals.",
+      enrolled: 3201,
+      rating: 4.6,
+    },
+    {
+      id: "c4",
+      title: "Mobile App UI/UX Design",
+      provider: "DesignMasters",
+      skillLevel: "intermediate",
+      duration: "5 weeks",
+      certificate: true,
+      skills: ["UI Design", "UX Principles", "Figma", "Prototyping", "User Testing"],
+      description:
+        "Learn to create beautiful, user-friendly mobile app interfaces. From wireframing to high-fidelity prototypes, master the complete design process.",
+      enrolled: 1453,
+      rating: 4.9,
+    },
+    {
+      id: "c5",
+      title: "Digital Marketing Specialist",
+      provider: "MarketingPro Academy",
+      skillLevel: "beginner",
+      duration: "7 weeks",
+      certificate: true,
+      skills: [
+        "SEO",
+        "Social Media Marketing",
+        "Content Marketing",
+        "Google Analytics",
+        "PPC Advertising",
+      ],
+      description:
+        "Become a well-rounded digital marketer with this comprehensive course covering all essential aspects of online marketing strategies.",
+      enrolled: 2789,
+      rating: 4.5,
+    },
+    {
+      id: "c6",
+      title: "Artificial Intelligence Fundamentals",
+      provider: "TechLearn Academy",
+      skillLevel: "advanced",
+      duration: "10 weeks",
+      certificate: true,
+      skills: ["Machine Learning", "Neural Networks", "Python", "TensorFlow", "Data Modeling"],
+      description:
+        "Dive into the world of AI with this advanced course covering machine learning algorithms, neural networks, and practical AI applications.",
+      enrolled: 1256,
+      rating: 4.7,
+    },
+  ];
+
+  const resumeTemplates: ResumeTemplate[] = [
+    {
+      id: "r1",
+      name: "Professional Classic",
+      category: "General",
+      imageUrl: "/placeholder.svg",
+      downloadUrl: "#",
+      format: "DOCX"
+    },
+    {
+      id: "r2",
+      name: "Creative Portfolio",
+      category: "Design",
+      imageUrl: "/placeholder.svg",
+      downloadUrl: "#",
+      format: "DOCX"
+    },
+    {
+      id: "r3",
+      name: "Technical Specialist",
+      category: "IT/Tech",
+      imageUrl: "/placeholder.svg",
+      downloadUrl: "#",
+      format: "DOCX"
+    },
+    {
+      id: "r4",
+      name: "Fresh Graduate",
+      category: "Entry Level",
+      imageUrl: "/placeholder.svg",
+      downloadUrl: "#",
+      format: "DOCX"
     }
   ];
-  
-  const internships = [
-    {
-      id: 5,
-      title: "Web Development Intern",
-      company: "CodeTech Solutions",
-      location: "Pune",
-      duration: "3 months",
-      stipend: "₹10,000 per month",
-      postedDate: "3 days ago",
-      skills: ["HTML", "CSS", "JavaScript", "Basic PHP"],
-      description: "Web development internship opportunity for college students to gain practical experience."
-    },
-    {
-      id: 6,
-      title: "Content Writing Intern",
-      company: "Digital Media Hub",
-      location: "Remote",
-      duration: "2 months",
-      stipend: "₹7,000 per month",
-      postedDate: "1 week ago",
-      skills: ["Content Writing", "Editing", "Research"],
-      description: "Content writing internship for students with good writing skills and creativity."
-    },
-    {
-      id: 7,
-      title: "Graphic Design Intern",
-      company: "CreativeWorks Studio",
-      location: "Chennai",
-      duration: "3 months",
-      stipend: "₹8,000 per month",
-      postedDate: "2 days ago",
-      skills: ["Photoshop", "Illustrator", "Creative Design"],
-      description: "Graphic design internship for students interested in visual communication and design."
-    }
-  ];
-  
-  const vocationalTraining = [
-    {
-      id: 8,
-      title: "Mobile Phone Repair Course",
-      provider: "Skill India Center",
-      location: "Multiple Locations",
-      duration: "2 months",
-      fee: "Free under PMKVY scheme",
-      startDate: "April 15, 2025",
-      skills: ["Electronics", "Hardware Repair", "Troubleshooting"],
-      description: "Vocational training program for mobile phone repair and maintenance."
-    },
-    {
-      id: 9,
-      title: "Beauty & Wellness Training",
-      provider: "National Skill Development Corporation",
-      location: "Delhi, Mumbai, Kolkata",
-      duration: "3 months",
-      fee: "Subsidized under government scheme",
-      startDate: "May 1, 2025",
-      skills: ["Cosmetology", "Hair Styling", "Makeup"],
-      description: "Comprehensive beauty and wellness training program with certification."
-    },
-    {
-      id: 10,
-      title: "Electrical Wiring & Repair",
-      provider: "Industrial Training Institute",
-      location: "Multiple Locations",
-      duration: "4 months",
-      fee: "₹2,000 (Scholarships available)",
-      startDate: "April 10, 2025",
-      skills: ["Electrical Systems", "Wiring", "Safety Procedures"],
-      description: "Hands-on training in electrical wiring, maintenance, and repair."
-    }
-  ];
-  
-  const getCurrentData = () => {
-    switch (activeTab) {
-      case "jobs":
-        return jobListings;
-      case "internships":
-        return internships;
-      case "vocational":
-        return vocationalTraining;
-      default:
-        return jobListings;
-    }
-  };
-  
-  const filterData = (data: any[]) => {
-    return data.filter(item => 
-      (searchQuery === "" || 
-       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-       item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-       (item.skills && item.skills.some((skill: string) => 
-         skill.toLowerCase().includes(searchQuery.toLowerCase())))) &&
-      (locationFilter === "all" || item.location === locationFilter || 
-       (locationFilter === "Remote" && item.location === "Remote")) &&
-      (typeFilter === "all" || 
-       (activeTab === "jobs" && item.type === typeFilter) || 
-       activeTab !== "jobs")
+
+  // Filter functions
+  const filteredJobs = jobs.filter((job) => {
+    return (
+      (job.title.toLowerCase().includes(jobSearchQuery.toLowerCase()) ||
+        job.company.toLowerCase().includes(jobSearchQuery.toLowerCase()) ||
+        job.description.toLowerCase().includes(jobSearchQuery.toLowerCase())) &&
+      (!selectedJobType || job.type === selectedJobType) &&
+      (!selectedLocation || job.location.toLowerCase() === selectedLocation.toLowerCase())
     );
+  });
+
+  const filteredWorkshops = workshops.filter((workshop) => {
+    return (
+      (workshop.title.toLowerCase().includes(workshopSearchQuery.toLowerCase()) ||
+        workshop.organizer.toLowerCase().includes(workshopSearchQuery.toLowerCase()) ||
+        workshop.description.toLowerCase().includes(workshopSearchQuery.toLowerCase())) &&
+      (!selectedWorkshopType || workshop.type === selectedWorkshopType)
+    );
+  });
+
+  const filteredCourses = courses.filter((course) => {
+    return (
+      (course.title.toLowerCase().includes(courseSearchQuery.toLowerCase()) ||
+        course.provider.toLowerCase().includes(courseSearchQuery.toLowerCase()) ||
+        course.description.toLowerCase().includes(courseSearchQuery.toLowerCase()) ||
+        course.skills.some(skill => skill.toLowerCase().includes(courseSearchQuery.toLowerCase()))) &&
+      (!selectedSkillLevel || course.skillLevel === selectedSkillLevel)
+    );
+  });
+
+  // Extract unique locations
+  const locations = Array.from(new Set(jobs.map(job => job.location)));
+
+  // Calculate days remaining
+  const getDaysRemaining = (deadline?: string) => {
+    if (!deadline) return null;
+    
+    const today = new Date();
+    const deadlineDate = new Date(deadline);
+    const diffTime = deadlineDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : 0;
   };
-  
-  const filteredData = filterData(getCurrentData());
-  
-  const handleApplyClick = (job: any) => {
-    setSelectedJob(job);
-    setShowApplyDialog(true);
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
-  
+
   return (
-    <div className="space-y-6">
-      <motion.div 
+    <div className="container py-8">
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
-            <h1 className="text-3xl font-bold">Employment Opportunities</h1>
-            <p className="text-muted-foreground">Find jobs, internships, and vocational training</p>
+            <h1 className="text-3xl font-bold mb-2">Employment Center</h1>
+            <p className="text-muted-foreground">Find jobs, workshops, and career resources</p>
           </div>
-          <Button 
-            className="bg-edubridge-blue"
-            onClick={() => setShowUploadDialog(true)}
-          >
-            <Upload className="mr-2 h-4 w-4" />
-            Upload Resume
-          </Button>
         </div>
-      </motion.div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="md:col-span-3">
-          <div className="relative mb-4">
-            <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder={`Search ${activeTab === "jobs" ? "jobs" : activeTab === "internships" ? "internships" : "training programs"}...`}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8"
-            />
-          </div>
-          
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-3 w-full md:w-[500px]">
-              <TabsTrigger value="jobs">Jobs</TabsTrigger>
-              <TabsTrigger value="internships">Internships</TabsTrigger>
-              <TabsTrigger value="vocational">Vocational Training</TabsTrigger>
-            </TabsList>
-            
-            <div className="my-4 flex flex-col md:flex-row gap-4">
-              <Select value={locationFilter} onValueChange={setLocationFilter}>
-                <SelectTrigger className="w-full md:w-[200px]">
-                  <MapPin className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Select Location" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Locations</SelectItem>
-                  <SelectItem value="Bangalore">Bangalore</SelectItem>
-                  <SelectItem value="Delhi">Delhi</SelectItem>
-                  <SelectItem value="Mumbai">Mumbai</SelectItem>
-                  <SelectItem value="Chennai">Chennai</SelectItem>
-                  <SelectItem value="Pune">Pune</SelectItem>
-                  <SelectItem value="Remote">Remote</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              {activeTab === "jobs" && (
-                <Select value={typeFilter} onValueChange={setTypeFilter}>
-                  <SelectTrigger className="w-full md:w-[200px]">
-                    <Clock className="h-4 w-4 mr-2" />
-                    <SelectValue placeholder="Job Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="Full-time">Full-time</SelectItem>
-                    <SelectItem value="Part-time">Part-time</SelectItem>
-                    <SelectItem value="Internship">Internship</SelectItem>
-                    <SelectItem value="Contract">Contract</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-              
-              <Button 
-                variant="outline" 
-                className="md:ml-auto"
-                onClick={() => {
-                  setLocationFilter("all");
-                  setTypeFilter("all");
-                  setSearchQuery("");
-                }}
-              >
-                Clear Filters
-              </Button>
-            </div>
-            
-            <TabsContent value="jobs">
-              <motion.div
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-                className="space-y-4"
-              >
-                {filteredData.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Briefcase className="mx-auto h-12 w-12 text-muted-foreground opacity-50 mb-4" />
-                    <h3 className="text-lg font-medium">No jobs found</h3>
-                    <p className="text-muted-foreground">Try adjusting your filters or search term</p>
-                  </div>
-                ) : (
-                  filteredData.map((job) => (
-                    <motion.div key={job.id} variants={itemVariants}>
-                      <Card className="module-card card-hover">
-                        <CardHeader className="pb-2">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h3 className="font-medium text-lg">{job.title}</h3>
-                              <div className="flex items-center text-sm text-muted-foreground mt-1">
-                                <Building className="h-4 w-4 mr-1" />
-                                {job.company}
-                              </div>
-                            </div>
-                            <Badge variant="outline" className={
-                              job.type === "Full-time" 
-                                ? "bg-green-500/10 text-green-600 border-green-500/30" 
-                                : job.type === "Part-time"
-                                  ? "bg-blue-500/10 text-blue-600 border-blue-500/30"
-                                  : "bg-yellow-500/10 text-yellow-600 border-yellow-500/30"
-                            }>
-                              {job.type}
-                            </Badge>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-4">
-                            <p className="text-sm text-muted-foreground">{job.description}</p>
-                            
-                            <div className="flex flex-wrap gap-2">
-                              {job.skills.map((skill: string, index: number) => (
-                                <span key={index} className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                                  {skill}
-                                </span>
-                              ))}
-                            </div>
-                            
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                              <div className="flex items-center">
-                                <MapPin className="h-4 w-4 mr-1 text-muted-foreground" />
-                                <span>{job.location}</span>
-                              </div>
-                              <div className="flex items-center">
-                                <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
-                                <span>Posted {job.postedDate}</span>
-                              </div>
-                              <div className="flex items-center col-span-2">
-                                <Briefcase className="h-4 w-4 mr-1 text-muted-foreground" />
-                                <span>{job.salary}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                        <CardFooter className="flex justify-between">
-                          <Button variant="outline" size="sm">
-                            <ExternalLink className="h-4 w-4 mr-1" />
-                            View Details
-                          </Button>
-                          <Button 
-                            size="sm"
-                            onClick={() => handleApplyClick(job)}
-                          >
-                            Apply Now
-                          </Button>
-                        </CardFooter>
-                      </Card>
-                    </motion.div>
-                  ))
-                )}
-              </motion.div>
-            </TabsContent>
-            
-            <TabsContent value="internships">
-              <motion.div
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-                className="space-y-4"
-              >
-                {filteredData.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Briefcase className="mx-auto h-12 w-12 text-muted-foreground opacity-50 mb-4" />
-                    <h3 className="text-lg font-medium">No internships found</h3>
-                    <p className="text-muted-foreground">Try adjusting your filters or search term</p>
-                  </div>
-                ) : (
-                  filteredData.map((internship) => (
-                    <motion.div key={internship.id} variants={itemVariants}>
-                      <Card className="module-card card-hover">
-                        <CardHeader className="pb-2">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h3 className="font-medium text-lg">{internship.title}</h3>
-                              <div className="flex items-center text-sm text-muted-foreground mt-1">
-                                <Building className="h-4 w-4 mr-1" />
-                                {internship.company}
-                              </div>
-                            </div>
-                            <Badge variant="outline" className="bg-edubridge-purple/10 text-edubridge-purple border-edubridge-purple/30">
-                              Internship
-                            </Badge>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-4">
-                            <p className="text-sm text-muted-foreground">{internship.description}</p>
-                            
-                            <div className="flex flex-wrap gap-2">
-                              {internship.skills.map((skill: string, index: number) => (
-                                <span key={index} className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                                  {skill}
-                                </span>
-                              ))}
-                            </div>
-                            
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                              <div className="flex items-center">
-                                <MapPin className="h-4 w-4 mr-1 text-muted-foreground" />
-                                <span>{internship.location}</span>
-                              </div>
-                              <div className="flex items-center">
-                                <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
-                                <span>Duration: {internship.duration}</span>
-                              </div>
-                              <div className="flex items-center">
-                                <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
-                                <span>Posted {internship.postedDate}</span>
-                              </div>
-                              <div className="flex items-center">
-                                <Briefcase className="h-4 w-4 mr-1 text-muted-foreground" />
-                                <span>{internship.stipend}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                        <CardFooter className="flex justify-between">
-                          <Button variant="outline" size="sm">
-                            <ExternalLink className="h-4 w-4 mr-1" />
-                            View Details
-                          </Button>
-                          <Button 
-                            size="sm"
-                            onClick={() => handleApplyClick(internship)}
-                          >
-                            Apply Now
-                          </Button>
-                        </CardFooter>
-                      </Card>
-                    </motion.div>
-                  ))
-                )}
-              </motion.div>
-            </TabsContent>
-            
-            <TabsContent value="vocational">
-              <motion.div
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-                className="space-y-4"
-              >
-                {filteredData.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Briefcase className="mx-auto h-12 w-12 text-muted-foreground opacity-50 mb-4" />
-                    <h3 className="text-lg font-medium">No training programs found</h3>
-                    <p className="text-muted-foreground">Try adjusting your filters or search term</p>
-                  </div>
-                ) : (
-                  filteredData.map((program) => (
-                    <motion.div key={program.id} variants={itemVariants}>
-                      <Card className="module-card card-hover">
-                        <CardHeader className="pb-2">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h3 className="font-medium text-lg">{program.title}</h3>
-                              <div className="flex items-center text-sm text-muted-foreground mt-1">
-                                <Building className="h-4 w-4 mr-1" />
-                                {program.provider}
-                              </div>
-                            </div>
-                            <Badge variant="outline" className="bg-edubridge-blue/10 text-edubridge-blue border-edubridge-blue/30">
-                              Training
-                            </Badge>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-4">
-                            <p className="text-sm text-muted-foreground">{program.description}</p>
-                            
-                            <div className="flex flex-wrap gap-2">
-                              {program.skills.map((skill: string, index: number) => (
-                                <span key={index} className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                                  {skill}
-                                </span>
-                              ))}
-                            </div>
-                            
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                              <div className="flex items-center">
-                                <MapPin className="h-4 w-4 mr-1 text-muted-foreground" />
-                                <span>{program.location}</span>
-                              </div>
-                              <div className="flex items-center">
-                                <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
-                                <span>Duration: {program.duration}</span>
-                              </div>
-                              <div className="flex items-center">
-                                <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
-                                <span>Starts: {program.startDate}</span>
-                              </div>
-                              <div className="flex items-center">
-                                <Briefcase className="h-4 w-4 mr-1 text-muted-foreground" />
-                                <span>Fee: {program.fee}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                        <CardFooter className="flex justify-between">
-                          <Button variant="outline" size="sm">
-                            <ExternalLink className="h-4 w-4 mr-1" />
-                            View Details
-                          </Button>
-                          <Button 
-                            size="sm"
-                            onClick={() => handleApplyClick(program)}
-                          >
-                            Enroll Now
-                          </Button>
-                        </CardFooter>
-                      </Card>
-                    </motion.div>
-                  ))
-                )}
-              </motion.div>
-            </TabsContent>
-          </Tabs>
-        </div>
-        
-        <div>
-          <Card>
-            <CardHeader>
-              <h2 className="text-lg font-semibold">Your Profile</h2>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-sm space-y-1">
-                <div className="font-medium">Resume Status</div>
-                <div className="flex items-center">
-                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/30">
-                    Needs Update
-                  </Badge>
-                </div>
-              </div>
-              
-              <div className="text-sm space-y-1">
-                <div className="font-medium">Skills Profile</div>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Completeness</span>
-                    <span>60%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-                    <div className="bg-edubridge-blue h-full rounded-full" style={{ width: "60%" }}></div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="text-sm space-y-2">
-                <div className="font-medium">Job Preferences</div>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="pref-fulltime" />
-                    <label htmlFor="pref-fulltime" className="text-sm">Full-time</label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="pref-parttime" />
-                    <label htmlFor="pref-parttime" className="text-sm">Part-time</label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="pref-internship" checked />
-                    <label htmlFor="pref-internship" className="text-sm">Internship</label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="pref-remote" checked />
-                    <label htmlFor="pref-remote" className="text-sm">Remote</label>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="flex flex-col gap-2">
-              <Button 
-                className="w-full"
-                onClick={() => setShowUploadDialog(true)}
-              >
-                <Upload className="mr-2 h-4 w-4" />
-                Update Resume
-              </Button>
-              <Button variant="outline" className="w-full">
-                Edit Preferences
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
-      </div>
-      
-      {/* Upload Resume Dialog */}
-      <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Upload Your Resume</DialogTitle>
-            <DialogDescription>
-              Upload your resume to apply for jobs and internships. Supported formats: PDF, DOC, DOCX.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="grid gap-4 py-4">
-            <div className="border-2 border-dashed rounded-lg p-8 text-center">
-              <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground mb-2">
-                Drag and drop your resume here, or click to browse
-              </p>
-              <Button size="sm" variant="outline">
-                Browse Files
-              </Button>
-            </div>
-            <div className="text-xs text-muted-foreground">
-              Maximum file size: 5MB. Your data is securely stored and only shared with employers when you apply.
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowUploadDialog(false)}>
-              Cancel
+
+        <Alert className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Important notice</AlertTitle>
+          <AlertDescription>
+            Register for an upcoming virtual career fair on December 20, 2023.
+            <Button variant="link" className="p-0 h-auto ml-2">
+              Learn more
             </Button>
-            <Button onClick={() => setShowUploadDialog(false)}>
-              Upload Resume
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Apply Dialog */}
-      <Dialog open={showApplyDialog} onOpenChange={setShowApplyDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {activeTab === "vocational" ? "Enroll in Program" : "Apply for Position"}
-            </DialogTitle>
-            <DialogDescription>
-              {selectedJob?.title} at {selectedJob?.company || selectedJob?.provider}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="grid gap-4 py-4">
-            {activeTab !== "vocational" && (
-              <div className="space-y-2">
-                <div className="font-medium text-sm">Resume</div>
-                <div className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center">
-                    <FileText className="h-5 w-5 mr-2 text-muted-foreground" />
-                    <span>MyResume.pdf</span>
-                  </div>
-                  <Button size="sm" variant="ghost">
-                    Change
-                  </Button>
-                </div>
+          </AlertDescription>
+        </Alert>
+
+        <Tabs defaultValue="jobs" className="w-full">
+          <TabsList className="mb-6">
+            <TabsTrigger value="jobs">Jobs & Internships</TabsTrigger>
+            <TabsTrigger value="workshops">Skill Workshops</TabsTrigger>
+            <TabsTrigger value="courses">Career Courses</TabsTrigger>
+            <TabsTrigger value="resources">Resources</TabsTrigger>
+          </TabsList>
+
+          {/* Jobs Tab */}
+          <TabsContent value="jobs">
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+              <div className="relative flex-grow">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search for jobs by title, company, or keywords..."
+                  value={jobSearchQuery}
+                  onChange={(e) => setJobSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <div className="flex gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="flex gap-2">
+                      <Filter className="h-4 w-4" />
+                      Job Type
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => setSelectedJobType(null)}>
+                      All Types
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSelectedJobType("full-time")}>
+                      Full-Time
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSelectedJobType("part-time")}>
+                      Part-Time
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSelectedJobType("internship")}>
+                      Internship
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="flex gap-2">
+                      <MapPin className="h-4 w-4" />
+                      Location
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => setSelectedLocation(null)}>
+                      All Locations
+                    </DropdownMenuItem>
+                    {locations.map(location => (
+                      <DropdownMenuItem 
+                        key={location}
+                        onClick={() => setSelectedLocation(location)}
+                      >
+                        {location}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+
+            {filteredJobs.length === 0 ? (
+              <div className="text-center py-10">
+                <Briefcase className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-medium">No jobs found</h3>
+                <p className="mt-2 text-muted-foreground">Try adjusting your search criteria</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredJobs.map((job) => (
+                  <Card key={job.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                        <div>
+                          <CardTitle>{job.title}</CardTitle>
+                          <CardDescription className="flex items-center mt-1">
+                            <Building className="h-4 w-4 mr-1" /> {job.company}
+                          </CardDescription>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <Badge variant="outline">
+                            <MapPin className="h-3 w-3 mr-1" /> {job.location}
+                          </Badge>
+                          <Badge variant={
+                            job.type === "full-time" ? "default" :
+                            job.type === "part-time" ? "secondary" : "outline"
+                          }>
+                            {job.type === "full-time" ? "Full-Time" :
+                             job.type === "part-time" ? "Part-Time" : "Internship"}
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="mb-4">{job.description}</p>
+                      
+                      {job.salary && (
+                        <p className="text-sm font-medium mb-2">
+                          Salary: {job.salary}
+                        </p>
+                      )}
+                      
+                      <div className="mt-4">
+                        <h4 className="text-sm font-medium mb-2">Requirements:</h4>
+                        <ul className="list-disc pl-5 space-y-1">
+                          {job.requirements.map((req, index) => (
+                            <li key={index} className="text-sm">{req}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-4 text-sm text-muted-foreground">
+                        <div className="flex items-center">
+                          <Calendar className="h-4 w-4 mr-1" />
+                          Posted: {formatDate(job.posted)}
+                        </div>
+                        
+                        {job.deadline && (
+                          <div className="flex items-center">
+                            <Clock className="h-4 w-4 mr-1" />
+                            {getDaysRemaining(job.deadline) !== null ? (
+                              <>Deadline: {getDaysRemaining(job.deadline)} days left</>
+                            ) : (
+                              <>Deadline: {formatDate(job.deadline)}</>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                    <CardFooter className="border-t pt-4 flex justify-between">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline">View Details</Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl">
+                          <DialogHeader>
+                            <DialogTitle>{job.title}</DialogTitle>
+                            <DialogDescription className="flex items-center">
+                              <Building className="h-4 w-4 mr-1" /> {job.company}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div className="flex flex-wrap gap-2">
+                              <Badge variant="outline">
+                                <MapPin className="h-3 w-3 mr-1" /> {job.location}
+                              </Badge>
+                              <Badge variant={
+                                job.type === "full-time" ? "default" :
+                                job.type === "part-time" ? "secondary" : "outline"
+                              }>
+                                {job.type === "full-time" ? "Full-Time" :
+                                job.type === "part-time" ? "Part-Time" : "Internship"}
+                              </Badge>
+                              {job.salary && (
+                                <Badge variant="outline">{job.salary}</Badge>
+                              )}
+                            </div>
+                            
+                            <div>
+                              <h3 className="text-md font-medium mb-2">Job Description</h3>
+                              <p>{job.description}</p>
+                            </div>
+                            
+                            <div>
+                              <h3 className="text-md font-medium mb-2">Requirements</h3>
+                              <ul className="list-disc pl-5 space-y-1">
+                                {job.requirements.map((req, index) => (
+                                  <li key={index}>{req}</li>
+                                ))}
+                              </ul>
+                            </div>
+                            
+                            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                              <div className="flex items-center">
+                                <Calendar className="h-4 w-4 mr-1" />
+                                Posted: {formatDate(job.posted)}
+                              </div>
+                              
+                              {job.deadline && (
+                                <div className="flex items-center">
+                                  <Clock className="h-4 w-4 mr-1" />
+                                  Deadline: {formatDate(job.deadline)}
+                                </div>
+                              )}
+                            </div>
+                            
+                            {job.deadline && getDaysRemaining(job.deadline) !== null && (
+                              <div>
+                                <div className="flex justify-between text-sm mb-1">
+                                  <span>Application Window</span>
+                                  <span>{getDaysRemaining(job.deadline)} days remaining</span>
+                                </div>
+                                <Progress value={100 - (getDaysRemaining(job.deadline)! / 30) * 100} className="h-2" />
+                              </div>
+                            )}
+                          </div>
+                          <DialogFooter>
+                            <Button variant="outline">Save Job</Button>
+                            <Button>Apply Now</Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                      <Button>Apply Now</Button>
+                    </CardFooter>
+                  </Card>
+                ))}
               </div>
             )}
-            
-            <div className="space-y-2">
-              <div className="font-medium text-sm">
-                {activeTab === "vocational" ? "Why are you interested in this program?" : "Cover Letter (Optional)"}
+          </TabsContent>
+
+          {/* Workshops Tab */}
+          <TabsContent value="workshops">
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+              <div className="relative flex-grow">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search for workshops..."
+                  value={workshopSearchQuery}
+                  onChange={(e) => setWorkshopSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
               </div>
-              <textarea 
-                className="w-full p-3 border rounded-lg h-32 focus:outline-none focus:ring-2 focus:ring-edubridge-blue"
-                placeholder={activeTab === "vocational" 
-                  ? "Tell us why you want to join this program and how it will help your career goals..."
-                  : "Briefly explain why you're a good fit for this position..."
-                }
-              ></textarea>
+              <div className="flex gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="flex gap-2">
+                      <Filter className="h-4 w-4" />
+                      Type
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => setSelectedWorkshopType(null)}>
+                      All Types
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSelectedWorkshopType("online")}>
+                      Online
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSelectedWorkshopType("offline")}>
+                      Offline
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
             
-            <div className="flex items-center space-x-2 mt-2">
-              <Checkbox id="terms" />
-              <label htmlFor="terms" className="text-xs">
-                I agree to share my profile information and consent to being contacted about this opportunity.
-              </label>
+            {filteredWorkshops.length === 0 ? (
+              <div className="text-center py-10">
+                <Calendar className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-medium">No workshops found</h3>
+                <p className="mt-2 text-muted-foreground">Try adjusting your search criteria</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredWorkshops.map((workshop) => (
+                  <Card key={workshop.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <CardTitle className="text-lg">{workshop.title}</CardTitle>
+                        <Badge variant={workshop.type === "online" ? "secondary" : "default"}>
+                          {workshop.type === "online" ? "Online" : "Offline"}
+                        </Badge>
+                      </div>
+                      <CardDescription>{workshop.organizer}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-col space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Date:</span>
+                          <span className="font-medium">{formatDate(workshop.date)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Duration:</span>
+                          <span className="font-medium">{workshop.duration}</span>
+                        </div>
+                        {workshop.type === "offline" && workshop.location && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Location:</span>
+                            <span className="font-medium">{workshop.location}</span>
+                          </div>
+                        )}
+                        {workshop.registration && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Registration Fee:</span>
+                            <span className="font-medium">{workshop.registration.fee || "Free"}</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <p className="mt-4 mb-4">{workshop.description}</p>
+                      
+                      <div>
+                        <h4 className="text-sm font-medium mb-2">Skills You'll Learn:</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {workshop.skillsTaught.map((skill, index) => (
+                            <Badge key={index} variant="outline">{skill}</Badge>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {workshop.registration && workshop.registration.deadline && (
+                        <div className="mt-4 text-sm">
+                          <div className="flex justify-between mb-1">
+                            <span className="text-muted-foreground">Registration Deadline:</span>
+                            <span>{formatDate(workshop.registration.deadline)}</span>
+                          </div>
+                          {getDaysRemaining(workshop.registration.deadline) !== null && (
+                            <div>
+                              <div className="flex justify-between text-xs mb-1">
+                                <span>Time Remaining</span>
+                                <span>{getDaysRemaining(workshop.registration.deadline)} days left</span>
+                              </div>
+                              <Progress value={100 - (getDaysRemaining(workshop.registration.deadline)! / 14) * 100} className="h-1" />
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </CardContent>
+                    <CardFooter>
+                      <Button className="w-full" onClick={() => window.open(workshop.registration?.url, "_blank")}>
+                        Register Now
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Courses Tab */}
+          <TabsContent value="courses">
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+              <div className="relative flex-grow">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search for courses or skills..."
+                  value={courseSearchQuery}
+                  onChange={(e) => setCourseSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <div className="flex gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="flex gap-2">
+                      <Filter className="h-4 w-4" />
+                      Skill Level
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => setSelectedSkillLevel(null)}>
+                      All Levels
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSelectedSkillLevel("beginner")}>
+                      Beginner
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSelectedSkillLevel("intermediate")}>
+                      Intermediate
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSelectedSkillLevel("advanced")}>
+                      Advanced
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowApplyDialog(false)}>
-              Cancel
-            </Button>
-            <Button onClick={() => setShowApplyDialog(false)}>
-              {activeTab === "vocational" ? "Submit Application" : "Apply Now"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            
+            {filteredCourses.length === 0 ? (
+              <div className="text-center py-10">
+                <BookOpen className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-medium">No courses found</h3>
+                <p className="mt-2 text-muted-foreground">Try adjusting your search criteria</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredCourses.map((course) => (
+                  <Card key={course.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <CardTitle className="text-lg">{course.title}</CardTitle>
+                        <Badge variant={
+                          course.skillLevel === "beginner" ? "outline" :
+                          course.skillLevel === "intermediate" ? "secondary" : "default"
+                        }>
+                          {course.skillLevel.charAt(0).toUpperCase() + course.skillLevel.slice(1)}
+                        </Badge>
+                      </div>
+                      <CardDescription>{course.provider}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="mb-4">{course.description}</p>
+                      
+                      <div className="flex flex-col space-y-2 text-sm mb-4">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Duration:</span>
+                          <span className="font-medium">{course.duration}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Certificate:</span>
+                          <span className="font-medium">{course.certificate ? "Yes" : "No"}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Students Enrolled:</span>
+                          <span className="font-medium">{course.enrolled.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Rating:</span>
+                          <span className="font-medium">{course.rating}/5.0</span>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h4 className="text-sm font-medium mb-2">Skills Covered:</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {course.skills.map((skill, index) => (
+                            <Badge key={index} variant="outline">{skill}</Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="border-t pt-4">
+                      <Button className="w-full">Enroll Now</Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Resources Tab */}
+          <TabsContent value="resources">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <FileTextIcon className="h-5 w-5 mr-2" />
+                    Resume Templates
+                  </CardTitle>
+                  <CardDescription>
+                    Professional resume templates to help you land your dream job
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-4">
+                    {resumeTemplates.map(template => (
+                      <div key={template.id} className="border rounded-lg overflow-hidden hover:border-primary transition-colors">
+                        <div className="h-40 bg-muted flex items-center justify-center">
+                          <FileTextIcon className="h-10 w-10 text-muted-foreground" />
+                        </div>
+                        <div className="p-3">
+                          <h4 className="font-medium">{template.name}</h4>
+                          <p className="text-xs text-muted-foreground">{template.category} • {template.format}</p>
+                          <Button variant="outline" size="sm" className="w-full mt-2">
+                            <Download className="h-3 w-3 mr-1" /> Download
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button variant="ghost" className="ml-auto">
+                    View All Templates
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </CardFooter>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <BookOpen className="h-5 w-5 mr-2" />
+                    Career Guides
+                  </CardTitle>
+                  <CardDescription>
+                    Helpful resources for career planning and skill development
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="border rounded-lg p-4 hover:border-primary transition-colors">
+                      <h4 className="font-medium mb-1">Interview Preparation Guide</h4>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Comprehensive guide to ace your next job interview
+                      </p>
+                      <Button variant="outline" size="sm">
+                        <Download className="h-3 w-3 mr-1" /> Download PDF
+                      </Button>
+                    </div>
+                    
+                    <div className="border rounded-lg p-4 hover:border-primary transition-colors">
+                      <h4 className="font-medium mb-1">Networking Tips for Students</h4>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Learn how to build professional connections while studying
+                      </p>
+                      <Button variant="outline" size="sm">
+                        <Download className="h-3 w-3 mr-1" /> Download PDF
+                      </Button>
+                    </div>
+                    
+                    <div className="border rounded-lg p-4 hover:border-primary transition-colors">
+                      <h4 className="font-medium mb-1">Salary Negotiation Handbook</h4>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Tips and strategies to negotiate your compensation
+                      </p>
+                      <Button variant="outline" size="sm">
+                        <Download className="h-3 w-3 mr-1" /> Download PDF
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button variant="ghost" className="ml-auto">
+                    View All Guides
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </CardFooter>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <GraduationCap className="h-5 w-5 mr-2" />
+                    Career Assessment Tools
+                  </CardTitle>
+                  <CardDescription>
+                    Discover your strengths, interests, and ideal career path
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <Button className="w-full">Take Skills Assessment</Button>
+                    <Button variant="outline" className="w-full">Career Aptitude Test</Button>
+                    <Button variant="outline" className="w-full">Personal Strength Finder</Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <ExternalLink className="h-5 w-5 mr-2" />
+                    Useful Links
+                  </CardTitle>
+                  <CardDescription>
+                    Additional resources to help your career journey
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center p-2 border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors">
+                      <div className="ml-2">
+                        <h4 className="font-medium">Government Employment Portal</h4>
+                        <p className="text-xs text-muted-foreground">
+                          Official job listings from government sectors
+                        </p>
+                      </div>
+                      <ExternalLink className="h-4 w-4 ml-auto" />
+                    </div>
+                    
+                    <div className="flex items-center p-2 border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors">
+                      <div className="ml-2">
+                        <h4 className="font-medium">National Apprenticeship Program</h4>
+                        <p className="text-xs text-muted-foreground">
+                          Find apprenticeship opportunities across industries
+                        </p>
+                      </div>
+                      <ExternalLink className="h-4 w-4 ml-auto" />
+                    </div>
+                    
+                    <div className="flex items-center p-2 border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors">
+                      <div className="ml-2">
+                        <h4 className="font-medium">Rural Skills Development Initiative</h4>
+                        <p className="text-xs text-muted-foreground">
+                          Programs focused on rural employment opportunities
+                        </p>
+                      </div>
+                      <ExternalLink className="h-4 w-4 ml-auto" />
+                    </div>
+                    
+                    <div className="flex items-center p-2 border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors">
+                      <div className="ml-2">
+                        <h4 className="font-medium">Scholarship & Financial Aid Resources</h4>
+                        <p className="text-xs text-muted-foreground">
+                          Find financial support for your education and training
+                        </p>
+                      </div>
+                      <ExternalLink className="h-4 w-4 ml-auto" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </motion.div>
     </div>
   );
 };

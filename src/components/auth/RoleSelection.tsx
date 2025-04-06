@@ -49,7 +49,7 @@ export function RoleSelection({ onRoleSelect }: RoleSelectionProps) {
     <div className="space-y-4 w-full max-w-md mx-auto">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold">Select Your Role</h2>
-        <p className="text-muted-foreground">Choose how you'll use EduBridge</p>
+        <p className="text-muted-foreground">Choose how you'll use AI Saathi</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
