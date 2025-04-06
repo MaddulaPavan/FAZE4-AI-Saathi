@@ -8,12 +8,25 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
 import { MainLayout } from "@/components/layout/MainLayout";
 import Auth from "./pages/Auth";
+import Index from "./pages/Index";  // Make sure to display the index page
 import Dashboard from "./pages/Dashboard";
 import LMS from "./pages/LMS";
 import Communication from "./pages/Communication";
 import NotFound from "./pages/NotFound";
 
-// Import other pages as they are created
+// Import the new pages we've created
+import Assessments from "./pages/Assessments";
+import Results from "./pages/Results";
+import LiveClasses from "./pages/LiveClasses";
+import Doubts from "./pages/Doubts";
+import Skills from "./pages/Skills";
+import Leaderboard from "./pages/Leaderboard";
+import Rewards from "./pages/Rewards";
+import StudyMaterials from "./pages/StudyMaterials";
+import Research from "./pages/Research";
+import Employment from "./pages/Employment";
+import Scholarships from "./pages/Scholarships";
+import Workspace from "./pages/Workspace";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient();
@@ -42,7 +55,7 @@ const App = () => {
               <Toaster />
               <Sonner />
               <Routes>
-                <Route path="/" element={<Navigate to="/auth" />} />
+                <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 
                 {/* Protected Routes */}
@@ -50,19 +63,19 @@ const App = () => {
                 <Route path="/lms" element={<ProtectedRoute element={<LMS />} />} />
                 <Route path="/communication" element={<ProtectedRoute element={<Communication />} />} />
                 
-                {/* Additional routes to be added as components are developed */}
-                <Route path="/assessments" element={<ProtectedRoute element={<div className="p-4">Assessments Module (Coming Soon)</div>} />} />
-                <Route path="/results" element={<ProtectedRoute element={<div className="p-4">Results Module (Coming Soon)</div>} />} />
-                <Route path="/live-classes" element={<ProtectedRoute element={<div className="p-4">Live Classes Module (Coming Soon)</div>} />} />
-                <Route path="/doubts" element={<ProtectedRoute element={<div className="p-4">Doubt System Module (Coming Soon)</div>} />} />
-                <Route path="/skills" element={<ProtectedRoute element={<div className="p-4">Skill Development Module (Coming Soon)</div>} />} />
-                <Route path="/leaderboard" element={<ProtectedRoute element={<div className="p-4">Leaderboard Module (Coming Soon)</div>} />} />
-                <Route path="/rewards" element={<ProtectedRoute element={<div className="p-4">Rewards Module (Coming Soon)</div>} />} />
-                <Route path="/study-materials" element={<ProtectedRoute element={<div className="p-4">Study Materials Module (Coming Soon)</div>} />} />
-                <Route path="/research" element={<ProtectedRoute element={<div className="p-4">Research Module (Coming Soon)</div>} />} />
-                <Route path="/employment" element={<ProtectedRoute element={<div className="p-4">Employment Module (Coming Soon)</div>} />} />
-                <Route path="/scholarships" element={<ProtectedRoute element={<div className="p-4">Scholarships Module (Coming Soon)</div>} />} />
-                <Route path="/workspace" element={<ProtectedRoute element={<div className="p-4">Workspace Module (Coming Soon)</div>} />} />
+                {/* All the newly implemented modules */}
+                <Route path="/assessments" element={<ProtectedRoute element={<Assessments />} />} />
+                <Route path="/results" element={<ProtectedRoute element={<Results />} />} />
+                <Route path="/live-classes" element={<ProtectedRoute element={<LiveClasses />} />} />
+                <Route path="/doubts" element={<ProtectedRoute element={<Doubts />} />} />
+                <Route path="/skills" element={<ProtectedRoute element={<Skills />} />} />
+                <Route path="/leaderboard" element={<ProtectedRoute element={<Leaderboard />} />} />
+                <Route path="/rewards" element={<ProtectedRoute element={<Rewards />} />} />
+                <Route path="/study-materials" element={<ProtectedRoute element={<StudyMaterials />} />} />
+                <Route path="/research" element={<ProtectedRoute element={<Research />} />} />
+                <Route path="/employment" element={<ProtectedRoute element={<Employment />} />} />
+                <Route path="/scholarships" element={<ProtectedRoute element={<Scholarships />} />} />
+                <Route path="/workspace" element={<ProtectedRoute element={<Workspace />} />} />
                 
                 {/* Mentor/Parent/Admin Routes */}
                 <Route path="/students" element={<ProtectedRoute element={<div className="p-4">Students Module (Coming Soon)</div>} />} />
