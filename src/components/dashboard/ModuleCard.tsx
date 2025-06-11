@@ -1,7 +1,7 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ModuleCard as ModuleCardType } from "@/types";
-import { LucideIcon } from "lucide-react";
+import { DivideIcon as LucideIcon } from "lucide-react";
 import { 
   Book, 
   MessageCircle, 
