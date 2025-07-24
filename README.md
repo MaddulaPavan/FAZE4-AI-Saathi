@@ -1,4 +1,4 @@
-# AI Saathi - Bridging the Education Gap
+# AI Saathi 
 
 AI Saathi is an AI-powered all-in-one educational platform designed to bridge the learning gap in **rural and underserved communities**. Built to work in low-internet environments, it enables personalized, accessible, and inclusive learning experiences using real-time AI mentorship, multilingual support, and voice-driven tools.
 
